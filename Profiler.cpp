@@ -219,6 +219,245 @@ public:
     }
 };
 
+class ScurveProfile{
+public:
+    bool isCreated;
+
+	//Area	area[7];
+
+    double  initTime[7];
+	double  diffTime[7];
+	double	initVel[7];
+	double  diffVel[7];
+	double  initPos[7];
+	double  diffPos[7];
+
+	double	curSecTime;
+	double	distance;
+	double	targetVel;
+	int areaNo;
+    double accDec;
+    double jerk;
+    double curDis;
+
+    ScurveProfile() {
+        this->areaNo = 0;
+    }
+
+    double getCurDis(void){
+        return this->curDis;
+    }
+
+    bool isDone(void){
+        /*
+        if (this->elapsedTime >= this->totalTime) 
+            return true;
+        else
+        */
+            return false;
+    }
+
+    bool isDecelerating(void) {
+        /*
+        if ((this->accTime + this->constTime) < this->elapsedTime && this->elapsedTime < this->totalTime) 
+            return true;
+        else
+        */
+        
+        return false;
+    }
+
+    bool makeProf(double acc, double dec, double vel, double dis) {
+    
+        this->jerk = 1;
+        this->accDec = acc; 
+        this->targetVel = vel;
+        this->distance = dis;
+
+        this->diffTime[0] = this->accDec / this->jerk;
+        this->diffVel[0] = this->accDec * (this->diffTime[0]) * 0.5;
+        this->diffTime[2] = this->diffTime[0];
+        this->diffVel[2] = this->diffVel[0];
+
+        if (this->targetVel < fabs(this->diffVel[0] + this->diffVel[2] ))
+        {
+            this->diffTime[1] = 0.;
+            this->diffVel[1] = 0.;
+            this->diffPos[1] = 0.;
+            this->accDec = sqrt(this->targetVel * this->jerk);
+            
+            this->diffTime[0] = fabs(this->accDec / this->jerk);
+            this->diffVel[0] = this->accDec * (this->diffTime[0]) * 0.5;
+            this->diffTime[2] = this->diffTime[0];
+            this->diffVel[2] = this->diffVel[0];
+
+            this->initVel[0] = 0.0;
+            this->diffVel[0] = this->jerk * this->diffTime[0] * this->diffTime[0] * 0.5;
+            this->initVel[1] = this->diffVel[0];
+            this->initVel[2] = this->initVel[1];
+            this->diffVel[2] = this->diffVel[0];
+            this->diffPos[0] = this->jerk * this->diffTime[0] * this->diffTime[0] * this->diffTime[0] / 6.0;
+            this->diffPos[2] = this->targetVel * this->diffTime[2] - this->jerk * this->diffTime[0] * this->diffTime[0] * this->diffTime[0] / 6.0;
+        }
+        else
+        {
+            this->diffVel[1] = this->targetVel - (this->diffVel[0] + this->diffVel[2]);
+            this->diffTime[1] = fabs(this->diffVel[1] / this->accDec);
+            this->initVel[0] = 0.0;
+            this->initVel[1] = this->diffVel[0];
+            this->initVel[2] = this->initVel[1] + this->diffVel[1];
+            this->diffVel[2] = this->diffVel[0];
+            this->jerk * this->diffTime[0] * this->diffTime[0] * this->diffTime[0] / 6.0;
+            this->diffPos[1] = (this->initVel[1] + this->initVel[2]) * this->diffTime[1] * 0.5;        
+            this->diffPos[0] = this->jerk * this->diffTime[0] * this->diffTime[0] * this->diffTime[0] / 6.0;
+            this->diffPos[2]  = targetVel  * this->diffTime[2] - this->diffPos[0];
+        
+        }
+
+        this->initVel[0] = 0.0;
+        this->initVel[1] = this->diffVel[0];
+        this->initVel[2] = this->initVel[1] + this->diffVel[1];
+
+        this->fillAllProfile();
+
+        if(this->distance < this->diffPos[0] + this->diffPos[1] 
+                            + this->diffPos[2] + this->diffPos[4] 
+                            + this->diffPos[5] + this->diffPos[6]) 
+        {
+            if(this->distance < 0.5 * this->accDec * this->accDec / this->jerk * this->accDec / this->jerk) {
+                // correct both acceleration and target velotity
+                this->accDec = cbrt(0.5 * this->distance * this->jerk * this->jerk); 
+                this->targetVel = this->accDec * this->accDec / this->jerk;
+            }
+            else{
+                // correct only target velocity
+                this->targetVel = (sqrt((this->accDec / (this->jerk) * this->accDec / (this->jerk) + 4.0 * this->distance / this->accDec)) 
+                                + this->accDec / (this->jerk) * (-1.)) * this->accDec * (0.5);
+            }
+
+            this->diffTime[0]	 = this->accDec / this->jerk;
+            this->diffVel[0] = this->accDec * (this->diffTime[0]) * 0.5;
+            this->diffTime[2] = this->diffTime[0];
+            this->diffVel[2] = this->diffVel[0];
+
+            this->diffVel[1] = this->targetVel - (this->diffVel[0] + this->diffVel[2]);
+            this->diffTime[1]   = fabs(this->diffVel[1] / this->accDec);
+            this->initVel[0]     = 0.0;
+            this->initVel[1]  = 0.0 + this->diffVel[0];
+            this->initVel[2]   = this->initVel[1] + this->diffVel[1];
+            this->diffVel[2]  = this->diffVel[0];
+
+            this->diffPos[1] = (this->initVel[1] + this->initVel[2]) * this->diffTime[1] * 0.5;        
+            this->diffPos[0]    = 0.0 + this->jerk * this->diffTime[0] * this->diffTime[0] * this->diffTime[0] / 6.0;
+            this->diffPos[2]  = targetVel  * this->diffTime[2] - this->diffPos[0];
+
+            this->fillAllProfile();
+        }
+
+        this->initVel[3] = this->targetVel;
+        this->diffVel[3] = 0.0;
+        this->diffTime[3] = (this->distance - (this->diffPos[0] + this->diffPos[1] 
+                                            + this->diffPos[2] + this->diffPos[4] 
+                                            + this->diffPos[5] + this->diffPos[6])) / this->targetVel;
+        this->diffPos[3] = this->targetVel * this->diffTime[3];
+
+        this->initTime[0] = 0.0;
+        this->initPos[0] = 0.0;
+
+        for (size_t i=1;i<7;i++) {
+            this->initTime[i] = this->initTime[i-1] + this->diffTime[i-1];
+            this->initPos[i] = this->initPos[i-1] + this->diffPos[i-1];
+        }
+    
+        return true;
+    }
+
+    bool calDis(double cycleTime) {
+
+        this->curSecTime += cycleTime;
+
+        while(this->areaNo < 7) 
+        {
+            if (this->curSecTime < this->initTime[this->areaNo] + this->diffTime[this->areaNo]){
+                break;
+            }
+            else{
+                this->areaNo++;
+            }        
+        }
+
+        double timeInArea;
+        double compTimeInArea;
+
+        switch(this->areaNo) 
+        {
+        case 0:
+            timeInArea = this->curSecTime;
+            this->curDis = this->initPos[0]
+                         + this->jerk * timeInArea * timeInArea * timeInArea / 6.0;
+            break;
+        case 1:
+            timeInArea = this->curSecTime - this->initTime[this->areaNo];
+            this->curDis = this->initPos[1]
+                                + (this->initVel[1] + this->initVel[1] 
+                                + this->accDec * timeInArea) * timeInArea * 0.5;
+            break;
+        case 2:
+            timeInArea = this->curSecTime - this->initTime[this->areaNo];
+            compTimeInArea = this->initTime[3] - this->curSecTime;
+            this->curDis = this->initPos[2] + this->targetVel * timeInArea
+                         - this->jerk * ((this->diffTime[2] * this->diffTime[2] * this->diffTime[2])
+                         - (compTimeInArea * compTimeInArea * compTimeInArea)) / 6.0;
+            break;
+        case 3:
+            timeInArea = this->curSecTime - this->initTime[this->areaNo];
+            this->curDis = this->initPos[3] + this->targetVel * timeInArea;
+            break;
+        case 4:
+            timeInArea = this->curSecTime - this->initTime[this->areaNo];
+            this->curDis = this->initPos[4] + this->targetVel * timeInArea
+                                    - this->jerk * timeInArea * timeInArea * timeInArea / 6.0;
+            break;
+        case 5:
+            timeInArea = this->curSecTime - this->initTime[this->areaNo];
+            this->curDis = this->initPos[5] + 
+                            (this->initVel[5] + this->initVel[5] - this->accDec * timeInArea) 
+                            * timeInArea * 0.5;
+            break;
+        case 6:
+            timeInArea = this->curSecTime - this->initTime[this->areaNo];
+            compTimeInArea = this->initTime[6]+ this->diffTime[6] - this->curSecTime;
+            this->curDis = this->initPos[6]
+                           + this->jerk * ((this->diffTime[6] * this->diffTime[6] * this->diffTime[6])
+                           - (compTimeInArea * compTimeInArea * compTimeInArea)) / 6.0;                                    
+            break;
+        case 7:
+            this->curDis = this->distance;
+            return false;
+        }
+
+        return true;
+    }
+
+    void fillAllProfile(){
+         
+        this->diffTime[6]	= this->diffTime[0];
+        this->diffVel[6] = this->diffVel[0] * -1.0;
+        this->diffPos[6] = this->diffPos[0];
+        this->diffTime[4]	 = this->diffTime[2];
+        this->diffVel[4] = this->diffVel[2] * -1.0;
+        this->diffPos[4] = this->diffPos[2];
+
+        this->diffTime[5]   = this->diffTime[1];
+        this->diffVel[6] = this->diffVel[1] * -1.0;
+        this->diffPos[5] = this->diffPos[1];	
+
+        this->initVel[4] = this->targetVel;
+        this->initVel[5] = this->initVel[4] + this->diffVel[4];
+        this->initVel[6] = this->initVel[5] + this->diffVel[6];
+    }
+};
+
 class Profiler{
 public:
     int dof;
@@ -331,7 +570,6 @@ public:
         return false;
     }
 
-
     bool execCmd(double cycleTime) {
 
         if (this->execProfId == -1)
@@ -350,7 +588,6 @@ public:
             if (!this->makeLinearProf(&this->profContainer[this->imposedProfId], 
                                       this->profContainer[this->execProfId].profInfo.getTargetPose()))
                 return false;
-        
         }
 
         if (this->profContainer[this->execProfId].calDis(cycleTime)){
@@ -759,11 +996,11 @@ bool testCase109(){
 
     std::string line;
     while (std::getline(file, line) && profiler.execCmd(cycleTime)) { // Read the file line by line
-        std::stringstream ss(line);   // Use stringstream to parse the line
+        std::stringstream ss(line);
         std::string value;
-        std::vector<std::string> row; // Store the values of the current row
+        std::vector<std::string> row;
 
-        while (std::getline(ss, value, ',')) { // Split by comma
+        while (std::getline(ss, value, ',')) {
             row.push_back(value);
         }
 
@@ -787,9 +1024,246 @@ bool testCase109(){
 
 }
 
+bool testCaseXXX(){
+    int dof = 6;
+    Profiler profiler(dof);
+
+    std::vector<double> curPose;
+    curPose.push_back(1.5708f);
+    curPose.push_back(-3.14159f);
+    curPose.push_back(1.5708f);
+    curPose.push_back(0.0f);
+    curPose.push_back(0.0f);
+    curPose.push_back(0.0f);
+
+    profiler.setCurrentPose(curPose);
+
+    std::vector<double> targetPose;
+    targetPose.push_back(1.68019f);
+    targetPose.push_back(-2.35679f);
+    targetPose.push_back(2.45324f);
+    targetPose.push_back(2.56348f);
+    targetPose.push_back(-0.904948f);
+    targetPose.push_back(3.63343f);
+
+    std::vector<double> targetVelsRad;
+    targetVelsRad.push_back(5.23598776f);
+    targetVelsRad.push_back(5.23598776f);
+    targetVelsRad.push_back(6.54498469f);
+    targetVelsRad.push_back(6.54498469f);
+    targetVelsRad.push_back(6.54498469f);
+    targetVelsRad.push_back(10.47197551f);
+
+    std::vector<double> targetAccsRad;
+    targetAccsRad.push_back(17.45329252f);
+    targetAccsRad.push_back(17.45329252f);
+    targetAccsRad.push_back(26.17993878f);
+    targetAccsRad.push_back(26.17993878f);
+    targetAccsRad.push_back(26.17993878f);
+    targetAccsRad.push_back(34.90658504f);
+
+    profiler.setCmd(targetPose, targetVelsRad, targetAccsRad, targetAccsRad);
+
+    targetPose[0] = 0.0;
+    targetPose[1] = 0.0;
+    targetPose[2] = 1.5708;
+    targetPose[3] = 0.0;
+    targetPose[4] = 0.0;
+    targetPose[5] = 0.0;
+    profiler.setCmd(targetPose, targetVelsRad, targetAccsRad, targetAccsRad);
+
+    double cycleTime = 0.1;
+
+    std::vector<double> cmdPose = curPose;
+
+    for (size_t i=0;i<dof;i++) {
+        std::cout << "vertex[" << i << "] = " << curPose[i] << ';' << std::endl;
+    }   
+    std::cout << std::endl;
+
+    while (profiler.execCmd(cycleTime)) { 
+        cmdPose = profiler.getCmdPose();
+        for (size_t i=0;i<dof;i++) {
+            std::cout << "vertex[" << i << "] = " << cmdPose[i] << ';' << std::endl;
+        }   
+        std::cout << std::endl;
+    }
+
+    if (profiler.execCmd(cycleTime)) return false;
+
+    cmdPose = profiler.getCmdPose();
+
+    for (size_t i=0;i<dof;i++) {
+        std::cout << "vertex[" << i << "] = " << cmdPose[i] << ';' << std::endl;
+    }   
+    std::cout << std::endl;
+
+    return true;
+
+}
+
+bool testCase_201(){
+
+    ScurveProfile sc;
+    // acc, dec, vel, pos
+    if (!sc.makeProf(1, 1, 5, 100)) return false;
+
+    double cycleTime = 0.2;
+    double curPos = 0.0;
+    double prePos = 0.0;
+    double curVel = 0.0;
+    double preVel = 0.0;
+    double curAcc = 0.0;
+
+    std::string filename = "./testCase/case201.csv";
+    std::ifstream file(filename);
+
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open file " << filename << std::endl;
+        return 1;
+    }
+
+    std::string line;
+    while (std::getline(file, line) && sc.calDis(cycleTime)) { // Read the file line by line
+        std::stringstream ss(line);
+        std::string value;
+        std::vector<std::string> row;
+
+        while (std::getline(ss, value, ',')) {
+            row.push_back(value);
+        }
+
+        curPos = sc.getCurDis();
+        curVel = (curPos - prePos) / cycleTime;
+        curAcc = (curVel - preVel) / cycleTime;
+
+        if (abs(curPos - std::stof(row[0])) > 0.0001) {
+                return false;
+        }
+        if (abs(curVel - std::stof(row[1])) > 0.0001) {
+                return false;
+        }
+        if (abs(curAcc - std::stof(row[2])) > 0.0001) {
+                return false;
+        }
+
+        prePos = curPos;
+        preVel = curVel;
+    }
+
+    return true;
+
+}
+
+bool testCase_202(){
+
+    ScurveProfile sc;
+    // acc, dec, vel, pos
+    if(!sc.makeProf(1, 1, 5, 0.25)) return false;
+
+    double cycleTime = 0.2;
+    double curPos = 0.0;
+    double prePos = 0.0;
+    double curVel = 0.0;
+    double preVel = 0.0;
+    double curAcc = 0.0;
+
+    std::string filename = "./testCase/case202.csv";
+    std::ifstream file(filename);
+
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open file " << filename << std::endl;
+        return 1;
+    }
+
+    std::string line;
+    while (std::getline(file, line) && sc.calDis(cycleTime)) { // Read the file line by line
+        std::stringstream ss(line);
+        std::string value;
+        std::vector<std::string> row;
+
+        while (std::getline(ss, value, ',')) {
+            row.push_back(value);
+        }
+
+        curPos = sc.getCurDis();
+        curVel = (curPos - prePos) / cycleTime;
+        curAcc = (curVel - preVel) / cycleTime;
+
+        if (abs(curPos - std::stof(row[0])) > 0.0001) {
+                return false;
+        }
+        if (abs(curVel - std::stof(row[1])) > 0.0001) {
+                return false;
+        }
+        if (abs(curAcc - std::stof(row[2])) > 0.0001) {
+                return false;
+        }
+
+        prePos = curPos;
+        preVel = curVel;
+    }
+
+    return true;
+
+}
+
+bool testCase_203(){
+
+    ScurveProfile sc;
+    // acc, dec, vel, pos
+    if (!sc.makeProf(1, 1, 100, 10)) return false;
+
+    double cycleTime = 0.2;
+    double curPos = 0.0;
+    double prePos = 0.0;
+    double curVel = 0.0;
+    double preVel = 0.0;
+    double curAcc = 0.0;
+
+    std::string filename = "./testCase/case203.csv";
+    std::ifstream file(filename);
+
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open file " << filename << std::endl;
+        return 1;
+    }
+
+    std::string line;
+    while (std::getline(file, line) && sc.calDis(cycleTime)) { // Read the file line by line
+        std::stringstream ss(line);
+        std::string value;
+        std::vector<std::string> row;
+
+        while (std::getline(ss, value, ',')) {
+            row.push_back(value);
+        }
+
+        curPos = sc.getCurDis();
+        curVel = (curPos - prePos) / cycleTime;
+        curAcc = (curVel - preVel) / cycleTime;
+
+        if (abs(curPos - std::stof(row[0])) > 0.0001) {
+                return false;
+        }
+        if (abs(curVel - std::stof(row[1])) > 0.0001) {
+                return false;
+        }
+        if (abs(curAcc - std::stof(row[2])) > 0.0001) {
+                return false;
+        }
+
+        prePos = curPos;
+        preVel = curVel;
+    }
+
+    return true;
+
+}
 
 
 int main(){
+
 
     int count = 0;
 
@@ -813,5 +1287,18 @@ int main(){
     if (testCase109()) std::cout << "PATH:" << count << std::endl;
     else std::cout << "NG:" << count << std::endl;
 
+//    testCaseXXX()
+
+    count = 201;
+    if (testCase_201()) std::cout << "PATH:" << count << std::endl;
+    else std::cout << "NG:" << count << std::endl;
+
+    count++;
+    if (testCase_202()) std::cout << "PATH:" << count << std::endl;
+    else std::cout << "NG:" << count << std::endl;
+
+    count++;
+    if (testCase_203()) std::cout << "PATH:" << count << std::endl;
+    else std::cout << "NG:" << count << std::endl;
 
 }
