@@ -223,8 +223,6 @@ class ScurveProfile{
 public:
     bool isCreated;
 
-	//Area	area[7];
-
     double  initTime[7];
 	double  diffTime[7];
 	double	initVel[7];
@@ -239,9 +237,20 @@ public:
     double accDec;
     double jerk;
     double curDis;
+    ProfileInfo profInfo;
 
-    ScurveProfile() {
-        this->areaNo = 0;
+    ScurveProfile():
+        isCreated(false),
+        curSecTime(0.0f),
+        distance(0.0f),
+        targetVel(0.0f),
+        areaNo(0),
+        accDec(0.0f),
+        jerk(0.0f),
+        curDis(0.0f),
+        profInfo(6)
+    {
+        ;
     }
 
     double getCurDis(void){
@@ -249,20 +258,19 @@ public:
     }
 
     bool isDone(void){
-        /*
-        if (this->elapsedTime >= this->totalTime) 
+
+        if (this->curSecTime >= this->initTime[6] + this->diffTime[6]) 
             return true;
         else
-        */
             return false;
+
     }
 
     bool isDecelerating(void) {
-        /*
-        if ((this->accTime + this->constTime) < this->elapsedTime && this->elapsedTime < this->totalTime) 
+        
+        if ((this->initTime[3] + this->diffTime[3]) < this->curSecTime 
+          && this->curSecTime < this->initTime[6] + this->diffTime[6]) 
             return true;
-        else
-        */
         
         return false;
     }
