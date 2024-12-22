@@ -7,7 +7,7 @@
 #include <sstream>
 #include <string>
 
-class ProfileInfo{
+class CommandInfo{
 public:
     std::vector<double> targetPose;
     std::vector<double> targetVels;
@@ -19,7 +19,7 @@ public:
     int baseCoordinate;
     int dof;
 
-    ProfileInfo() :
+    CommandInfo() :
         dof(6),
         targetPose(dof, 0.0f),
         targetVels(dof, 0.0f),
@@ -120,7 +120,7 @@ public:
     double totalDis = 0;
     double curDis = 0;
     double elapsedTime = 0;
-    ProfileInfo profInfo;
+    CommandInfo cmdInfo;
 
     TrapezoidalProfile():
         isCreated(false),
@@ -140,7 +140,7 @@ public:
         totalDis(0.0f),
         curDis(0.0f),
         elapsedTime(0.0f),
-        profInfo()
+        cmdInfo()
     {
         // initilization
         
@@ -248,7 +248,7 @@ public:
     double accDec;
     double jerk;
     double curDis;
-    //ProfileInfo profInfo;
+    //CommandInfo cmdInfo;
 
     // temporale variable
     double accTime;
@@ -265,7 +265,7 @@ public:
         accDec(0.0f),
         jerk(0.0f),
         curDis(0.0f)//,
-        //profInfo(6)
+        //cmdInfo(6)
     {
         ;
     }
@@ -502,7 +502,7 @@ public:
     int imposedProfId;
     int maxProfNum;
     int storedProfNum;
-    ProfileInfo profInfo[8];
+    CommandInfo cmdInfo[8];
     ScurveProfile* execProf;
     ScurveProfile* imposedProf;
 
@@ -545,8 +545,8 @@ public:
             std::cout << "The number of profiler exceeds the limit" << std::endl;
         }
 
-        //this->profContainer[this->storedProfNum].profInfo.setParam(targetPose, targetVels, targetAccs, targetDecs);
-        this->profInfo[this->storedProfNum].setParam(targetPose, targetVels, targetAccs, targetDecs);
+        //this->profContainer[this->storedProfNum].cmdInfo.setParam(targetPose, targetVels, targetAccs, targetDecs);
+        this->cmdInfo[this->storedProfNum].setParam(targetPose, targetVels, targetAccs, targetDecs);
         this->storedProfNum++;
 
     }
@@ -564,17 +564,17 @@ public:
     }
 
 //    bool makeLinearProf(TrapezoidalProfile* prof, std::vector<double> startPose) {
-    bool makeLinearProf(ScurveProfile* &prof, ProfileInfo* profInfo, std::vector<double> startPose) {
+    bool makeLinearProf(ScurveProfile* &prof, CommandInfo* cmdInfo, std::vector<double> startPose) {
         
         if (prof == nullptr)
             return false;
 
-        //ProfileInfo* profInfo = &prof->profInfo;
-        profInfo->setStartPose(startPose);
+        //CommandInfo* cmdInfo = &prof->cmdInfo;
+        cmdInfo->setStartPose(startPose);
 
         std::vector<double> times(this->dof, 0.0f);
-        std::vector<double> unsignedTotalDis = profInfo->getUnsignedTotalDistance();
-        std::vector<double> targetVel = profInfo->getTargetVels();
+        std::vector<double> unsignedTotalDis = cmdInfo->getUnsignedTotalDistance();
+        std::vector<double> targetVel = cmdInfo->getTargetVels();
 
         for(size_t i=0; i<this->dof; i++) {
             times[i] = unsignedTotalDis[i] / targetVel[i];
@@ -585,24 +585,24 @@ public:
         for (size_t i=0;i<this->dof;i++){
             if (maxTime < times[i]){
                 maxTime = times[i];
-                profInfo->setBaseCoordinate(i);
+                cmdInfo->setBaseCoordinate(i);
             }
         }
 
-        std::vector<double> accs = profInfo->getTargetAccs();
-        std::vector<double> decs = profInfo->getTargetDecs();
-        std::vector<double> vels = profInfo->getTargetVels();
-        std::vector<double> diss = profInfo->getUnsignedTotalDistance();
+        std::vector<double> accs = cmdInfo->getTargetAccs();
+        std::vector<double> decs = cmdInfo->getTargetDecs();
+        std::vector<double> vels = cmdInfo->getTargetVels();
+        std::vector<double> diss = cmdInfo->getUnsignedTotalDistance();
 
         for (size_t i=0;i<this->dof;i++){
             if (accs[i] < 0 || decs[i] < 0 || vels[i] < 0)
                 return false;
         }
 
-        double acc = accs[profInfo->getBaseCoordinate()];
-        double dec = decs[profInfo->getBaseCoordinate()];
-        double vel = vels[profInfo->getBaseCoordinate()];
-        double dis = diss[profInfo->getBaseCoordinate()];
+        double acc = accs[cmdInfo->getBaseCoordinate()];
+        double dec = decs[cmdInfo->getBaseCoordinate()];
+        double vel = vels[cmdInfo->getBaseCoordinate()];
+        double dis = diss[cmdInfo->getBaseCoordinate()];
 
         return prof->makeProf(acc, dec, vel, dis);
     }
@@ -629,7 +629,7 @@ public:
             else {
                 this->execProfId = 0;
                 if (!this->makeLinearProf(this->execProf,
-                                          &this->profInfo[this->execProfId], this->curPose)) 
+                                          &this->cmdInfo[this->execProfId], this->curPose)) 
                     return false;
             }
         }
@@ -637,20 +637,19 @@ public:
         if (this->imposedProfId == -1 && this->execProfId < this->storedProfNum - 1) {
             this->imposedProfId = this->execProfId + 1;
             
-            if (!this->makeLinearProf(this->imposedProf, &this->profInfo[this->imposedProfId], 
-                                      this->profInfo[this->execProfId].getTargetPose()))
+            if (!this->makeLinearProf(this->imposedProf, &this->cmdInfo[this->imposedProfId], 
+                                      this->cmdInfo[this->execProfId].getTargetPose()))
                 return false;
         }
-        
         if (this->execProf->calDis(cycleTime)){
             double curDis = this->execProf->getCurDis();
-            int baseCoordinate = this->profInfo[this->execProfId].getBaseCoordinate();
-            std::vector<double> totalDis = this->profInfo[this->execProfId].getUnsignedTotalDistance();
+            int baseCoordinate = this->cmdInfo[this->execProfId].getBaseCoordinate();
+            std::vector<double> totalDis = this->cmdInfo[this->execProfId].getUnsignedTotalDistance();
 
             double rate = curDis / totalDis[baseCoordinate];
             
-            std::vector<double> startPose = this->profInfo[this->execProfId].getStartPose();
-            std::vector<double> signedTotalDis = this->profInfo[this->execProfId].getSignedTotalDistance();
+            std::vector<double> startPose = this->cmdInfo[this->execProfId].getStartPose();
+            std::vector<double> signedTotalDis = this->cmdInfo[this->execProfId].getSignedTotalDistance();
 
             for (size_t i=0;i<this->dof;i++){
                 this->curPose[i] = startPose[i] + signedTotalDis[i] * rate;
@@ -661,11 +660,11 @@ public:
             //&this->profContainer[this->execProfId], &this->profContainer[this->imposedProfId])) {
                 if (this->imposedProf->calDis(cycleTime)){
                     double ipDis = this->imposedProf->getCurDis();
-                    double ipBaseCoordinate = this->profInfo[this->imposedProfId].getBaseCoordinate();
-                    std::vector<double> ipTotalDis = this->profInfo[this->imposedProfId].getUnsignedTotalDistance();
+                    double ipBaseCoordinate = this->cmdInfo[this->imposedProfId].getBaseCoordinate();
+                    std::vector<double> ipTotalDis = this->cmdInfo[this->imposedProfId].getUnsignedTotalDistance();
                     double ipRate = ipDis / ipTotalDis[ipBaseCoordinate];  
 
-                    std::vector<double> signedTotalDis = this->profInfo[this->imposedProfId].getSignedTotalDistance();
+                    std::vector<double> signedTotalDis = this->cmdInfo[this->imposedProfId].getSignedTotalDistance();
                     for (size_t i=0;i<this->dof;i++){
                         this->curPose[i] += signedTotalDis[i] * ipRate;
                     }
@@ -683,7 +682,7 @@ public:
 
         if (this->execProf->isDone()){
             if (this->imposedProfId == -1) {
-                std::vector<double> endPos = this->profInfo[this->execProfId].getTargetPose();
+                std::vector<double> endPos = this->cmdInfo[this->execProfId].getTargetPose();
                 for (size_t i=0;i<this->dof;i++) {
                     this->curVels[i] = 0.0;
                     this->preVels[i] = 0.0;
