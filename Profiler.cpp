@@ -502,7 +502,8 @@ public:
     int imposedProfId;
     int maxProfNum;
     int storedProfNum;
-    CommandInfo cmdInfo[8];
+    //CommandInfo cmdInfo[8];
+    std::vector<CommandInfo> cmdContainer;
     ScurveProfile* execProf;
     ScurveProfile* imposedProf;
 
@@ -541,12 +542,15 @@ public:
 
     void setCmd(std::vector<double> targetPose, std::vector<double> targetVels, std::vector<double> targetAccs, std::vector<double> targetDecs){
         
+        CommandInfo cmd;
+        this->cmdContainer.push_back(cmd);
+
         if (this->storedProfNum > this->maxProfNum) {
             std::cout << "The number of profiler exceeds the limit" << std::endl;
         }
 
-        //this->profContainer[this->storedProfNum].cmdInfo.setParam(targetPose, targetVels, targetAccs, targetDecs);
-        this->cmdInfo[this->storedProfNum].setParam(targetPose, targetVels, targetAccs, targetDecs);
+        //this->profContainer[this->storedProfNum].cmdContainer.setParam(targetPose, targetVels, targetAccs, targetDecs);
+        this->cmdContainer[this->storedProfNum].setParam(targetPose, targetVels, targetAccs, targetDecs);
         this->storedProfNum++;
 
     }
@@ -629,7 +633,7 @@ public:
             else {
                 this->execProfId = 0;
                 if (!this->makeLinearProf(this->execProf,
-                                          &this->cmdInfo[this->execProfId], this->curPose)) 
+                                          &this->cmdContainer[this->execProfId], this->curPose)) 
                     return false;
             }
         }
@@ -637,19 +641,19 @@ public:
         if (this->imposedProfId == -1 && this->execProfId < this->storedProfNum - 1) {
             this->imposedProfId = this->execProfId + 1;
             
-            if (!this->makeLinearProf(this->imposedProf, &this->cmdInfo[this->imposedProfId], 
-                                      this->cmdInfo[this->execProfId].getTargetPose()))
+            if (!this->makeLinearProf(this->imposedProf, &this->cmdContainer[this->imposedProfId], 
+                                      this->cmdContainer[this->execProfId].getTargetPose()))
                 return false;
         }
         if (this->execProf->calDis(cycleTime)){
             double curDis = this->execProf->getCurDis();
-            int baseCoordinate = this->cmdInfo[this->execProfId].getBaseCoordinate();
-            std::vector<double> totalDis = this->cmdInfo[this->execProfId].getUnsignedTotalDistance();
+            int baseCoordinate = this->cmdContainer[this->execProfId].getBaseCoordinate();
+            std::vector<double> totalDis = this->cmdContainer[this->execProfId].getUnsignedTotalDistance();
 
             double rate = curDis / totalDis[baseCoordinate];
             
-            std::vector<double> startPose = this->cmdInfo[this->execProfId].getStartPose();
-            std::vector<double> signedTotalDis = this->cmdInfo[this->execProfId].getSignedTotalDistance();
+            std::vector<double> startPose = this->cmdContainer[this->execProfId].getStartPose();
+            std::vector<double> signedTotalDis = this->cmdContainer[this->execProfId].getSignedTotalDistance();
 
             for (size_t i=0;i<this->dof;i++){
                 this->curPose[i] = startPose[i] + signedTotalDis[i] * rate;
@@ -660,11 +664,11 @@ public:
             //&this->profContainer[this->execProfId], &this->profContainer[this->imposedProfId])) {
                 if (this->imposedProf->calDis(cycleTime)){
                     double ipDis = this->imposedProf->getCurDis();
-                    double ipBaseCoordinate = this->cmdInfo[this->imposedProfId].getBaseCoordinate();
-                    std::vector<double> ipTotalDis = this->cmdInfo[this->imposedProfId].getUnsignedTotalDistance();
+                    double ipBaseCoordinate = this->cmdContainer[this->imposedProfId].getBaseCoordinate();
+                    std::vector<double> ipTotalDis = this->cmdContainer[this->imposedProfId].getUnsignedTotalDistance();
                     double ipRate = ipDis / ipTotalDis[ipBaseCoordinate];  
 
-                    std::vector<double> signedTotalDis = this->cmdInfo[this->imposedProfId].getSignedTotalDistance();
+                    std::vector<double> signedTotalDis = this->cmdContainer[this->imposedProfId].getSignedTotalDistance();
                     for (size_t i=0;i<this->dof;i++){
                         this->curPose[i] += signedTotalDis[i] * ipRate;
                     }
@@ -682,7 +686,7 @@ public:
 
         if (this->execProf->isDone()){
             if (this->imposedProfId == -1) {
-                std::vector<double> endPos = this->cmdInfo[this->execProfId].getTargetPose();
+                std::vector<double> endPos = this->cmdContainer[this->execProfId].getTargetPose();
                 for (size_t i=0;i<this->dof;i++) {
                     this->curVels[i] = 0.0;
                     this->preVels[i] = 0.0;
@@ -1418,7 +1422,7 @@ bool testCase301(void){
             cmdVels[i] = (cmdPose[i] - prePose[i]) / cycleTime;
             cmdAccs[i] = (cmdVels[i] - preVels[i]) / cycleTime;
 
-            //std::cout << cmdAccs[i] << ",";
+            //std::cout << cmdPose[i] << ",";
             //foutp << cmdPose[i] << ",";
             //foutv << cmdVels[i] << ",";
             //fouta << cmdAccs[i] << ",";
