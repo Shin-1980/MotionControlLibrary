@@ -19,8 +19,8 @@ public:
     int baseCoordinate;
     int dof;
 
-    ProfileInfo(int degreesOfFreedom) :
-        dof(degreesOfFreedom),
+    ProfileInfo() :
+        dof(6),
         targetPose(dof, 0.0f),
         targetVels(dof, 0.0f),
         targetAccs(dof, 0.0f),
@@ -87,7 +87,18 @@ public:
     }
 };
 
-class TrapezoidalProfile{
+/*
+class TrajectoryProfile{
+public:
+    virtual double getCurDis() = 0;
+    virtual bool isDone() = 0;
+    virtual bool isDecelerating() = 0;
+    virtual bool makeProf(double acc, double dec, double vel, double dis) = 0;
+    virtual bool calDis(double cycleTime) = 0;    
+};
+*/
+
+class TrapezoidalProfile /*: public TrajectoryProfile*/{
 public:
     bool isCreated;
     double accTime = 0;
@@ -129,7 +140,7 @@ public:
         totalDis(0.0f),
         curDis(0.0f),
         elapsedTime(0.0f),
-        profInfo(6)
+        profInfo()
     {
         // initilization
         
@@ -219,7 +230,7 @@ public:
     }
 };
 
-class ScurveProfile{
+class ScurveProfile /*: public TrajectoryProfile*/{
 public:
     bool isCreated;
 
@@ -237,8 +248,14 @@ public:
     double accDec;
     double jerk;
     double curDis;
-    ProfileInfo profInfo;
+    //ProfileInfo profInfo;
 
+    // temporale variable
+    double accTime;
+    double decTime;
+    double elapsedTime;
+    double totalTime;
+ 
     ScurveProfile():
         isCreated(false),
         curSecTime(0.0f),
@@ -247,8 +264,8 @@ public:
         areaNo(0),
         accDec(0.0f),
         jerk(0.0f),
-        curDis(0.0f),
-        profInfo(6)
+        curDis(0.0f)//,
+        //profInfo(6)
     {
         ;
     }
@@ -377,12 +394,18 @@ public:
             this->initPos[i] = this->initPos[i-1] + this->diffPos[i-1];
         }
     
+        // temporal code
+        this->accTime = this->diffTime[0] + this->diffTime[1] + this->diffTime[2];
+        this->decTime = this->diffTime[4] + this->diffTime[5] + this->diffTime[6];
+        this->totalTime = this->accTime + this->diffTime[3] + this->decTime;
+
         return true;
     }
 
     bool calDis(double cycleTime) {
 
         this->curSecTime += cycleTime;
+        this->elapsedTime = this->curSecTime;
 
         while(this->areaNo < 7) 
         {
@@ -447,12 +470,13 @@ public:
         return true;
     }
 
+private:
     void fillAllProfile(){
          
-        this->diffTime[6]	= this->diffTime[0];
+        this->diffTime[6] = this->diffTime[0];
         this->diffVel[6] = this->diffVel[0] * -1.0;
         this->diffPos[6] = this->diffPos[0];
-        this->diffTime[4]	 = this->diffTime[2];
+        this->diffTime[4] = this->diffTime[2];
         this->diffVel[4] = this->diffVel[2] * -1.0;
         this->diffPos[4] = this->diffPos[2];
 
@@ -466,7 +490,7 @@ public:
     }
 };
 
-class Profiler{
+class MotionController{
 public:
     int dof;
     std::vector<double> curPose;
@@ -478,10 +502,11 @@ public:
     int imposedProfId;
     int maxProfNum;
     int storedProfNum;
+    ProfileInfo profInfo[8];
+    ScurveProfile* execProf;
+    ScurveProfile* imposedProf;
 
-    TrapezoidalProfile profContainer[8];
-
-    Profiler(int degreesOfFreedom):
+    MotionController(int degreesOfFreedom):
         dof(degreesOfFreedom),        
         curPose(dof, 0.0f),
         curVels(dof, 0.0f),
@@ -495,6 +520,19 @@ public:
     {
         // initialization
     }
+/*
+    ~Profiler() {
+        delete execProf;
+        delete imposedProf;
+    }
+*/
+    void setProfile(ScurveProfile* &prof) {
+        this->execProf = prof;
+    }
+
+    void setImposedProfile(ScurveProfile* &prof) {
+        this->imposedProf = prof;
+    }
 
     void setCurrentPose(std::vector<double> curPose){
         this->curPose = curPose;
@@ -507,7 +545,8 @@ public:
             std::cout << "The number of profiler exceeds the limit" << std::endl;
         }
 
-        this->profContainer[this->storedProfNum].profInfo.setParam(targetPose, targetVels, targetAccs, targetDecs);
+        //this->profContainer[this->storedProfNum].profInfo.setParam(targetPose, targetVels, targetAccs, targetDecs);
+        this->profInfo[this->storedProfNum].setParam(targetPose, targetVels, targetAccs, targetDecs);
         this->storedProfNum++;
 
     }
@@ -524,16 +563,18 @@ public:
         return this->curAccs;
     }
 
-    bool makeLinearProf(TrapezoidalProfile* prof, std::vector<double> startPose) {
-                    
+//    bool makeLinearProf(TrapezoidalProfile* prof, std::vector<double> startPose) {
+    bool makeLinearProf(ScurveProfile* &prof, ProfileInfo* profInfo, std::vector<double> startPose) {
+        
         if (prof == nullptr)
             return false;
 
-        prof->profInfo.setStartPose(startPose);
+        //ProfileInfo* profInfo = &prof->profInfo;
+        profInfo->setStartPose(startPose);
 
         std::vector<double> times(this->dof, 0.0f);
-        std::vector<double> unsignedTotalDis = prof->profInfo.getUnsignedTotalDistance();
-        std::vector<double> targetVel = prof->profInfo.getTargetVels();
+        std::vector<double> unsignedTotalDis = profInfo->getUnsignedTotalDistance();
+        std::vector<double> targetVel = profInfo->getTargetVels();
 
         for(size_t i=0; i<this->dof; i++) {
             times[i] = unsignedTotalDis[i] / targetVel[i];
@@ -544,35 +585,36 @@ public:
         for (size_t i=0;i<this->dof;i++){
             if (maxTime < times[i]){
                 maxTime = times[i];
-                prof->profInfo.setBaseCoordinate(i);
+                profInfo->setBaseCoordinate(i);
             }
         }
 
-        std::vector<double> accs = prof->profInfo.getTargetAccs();
-        std::vector<double> decs = prof->profInfo.getTargetDecs();
-        std::vector<double> vels = prof->profInfo.getTargetVels();
-        std::vector<double> diss = prof->profInfo.getUnsignedTotalDistance();
+        std::vector<double> accs = profInfo->getTargetAccs();
+        std::vector<double> decs = profInfo->getTargetDecs();
+        std::vector<double> vels = profInfo->getTargetVels();
+        std::vector<double> diss = profInfo->getUnsignedTotalDistance();
 
         for (size_t i=0;i<this->dof;i++){
             if (accs[i] < 0 || decs[i] < 0 || vels[i] < 0)
                 return false;
         }
 
-        double acc = accs[prof->profInfo.getBaseCoordinate()];
-        double dec = decs[prof->profInfo.getBaseCoordinate()];
-        double vel = vels[prof->profInfo.getBaseCoordinate()];
-        double dis = diss[prof->profInfo.getBaseCoordinate()];
+        double acc = accs[profInfo->getBaseCoordinate()];
+        double dec = decs[profInfo->getBaseCoordinate()];
+        double vel = vels[profInfo->getBaseCoordinate()];
+        double dis = diss[profInfo->getBaseCoordinate()];
 
         return prof->makeProf(acc, dec, vel, dis);
     }
 
-    bool isEnableToExecImposedProf(TrapezoidalProfile* execProf, TrapezoidalProfile* imposedProf) {
-
-        if (imposedProf != nullptr && execProf->isDecelerating()){
-            if (execProf->decTime < imposedProf->totalTime)
+//    bool isEnableToExecImposedProf(TrapezoidalProfile* execProf, TrapezoidalProfile* imposedProf) {
+//    bool isEnableToExecImposedProf(ScurveProfile* execProf, ScurveProfile* imposedProf) {
+    bool isEnableToExecImposedProf() {
+        if (this->imposedProf != nullptr && this->execProf->isDecelerating()){
+            if (this->execProf->decTime < this->imposedProf->totalTime)
                 return true;
             else
-                if (execProf->elapsedTime > (execProf->totalTime - imposedProf->accTime)) return true;
+                if (this->execProf->elapsedTime > (this->execProf->totalTime - this->imposedProf->accTime)) return true;
         }
 
         return false;
@@ -580,46 +622,50 @@ public:
 
     bool execCmd(double cycleTime) {
 
-        if (this->execProfId == -1)
+        if (this->execProfId == -1){
             if (this->storedProfNum == 0) {
                 return false;
             }
             else {
                 this->execProfId = 0;
-                if (!this->makeLinearProf(&this->profContainer[this->execProfId], this->curPose)) 
+                if (!this->makeLinearProf(this->execProf,
+                                          &this->profInfo[this->execProfId], this->curPose)) 
                     return false;
             }
-
+        }
+        
         if (this->imposedProfId == -1 && this->execProfId < this->storedProfNum - 1) {
             this->imposedProfId = this->execProfId + 1;
             
-            if (!this->makeLinearProf(&this->profContainer[this->imposedProfId], 
-                                      this->profContainer[this->execProfId].profInfo.getTargetPose()))
+            if (!this->makeLinearProf(this->imposedProf, &this->profInfo[this->imposedProfId], 
+                                      this->profInfo[this->execProfId].getTargetPose()))
                 return false;
         }
-
-        if (this->profContainer[this->execProfId].calDis(cycleTime)){
-            double curDis = this->profContainer[this->execProfId].getCurDis();
-            int baseCoordinate = this->profContainer[this->execProfId].profInfo.getBaseCoordinate();
-            std::vector<double> totalDis = this->profContainer[this->execProfId].profInfo.getUnsignedTotalDistance();
+        
+        if (this->execProf->calDis(cycleTime)){
+            double curDis = this->execProf->getCurDis();
+            int baseCoordinate = this->profInfo[this->execProfId].getBaseCoordinate();
+            std::vector<double> totalDis = this->profInfo[this->execProfId].getUnsignedTotalDistance();
 
             double rate = curDis / totalDis[baseCoordinate];
-
-            std::vector<double> startPose = this->profContainer[this->execProfId].profInfo.getStartPose();
-            std::vector<double> signedTotalDis = this->profContainer[this->execProfId].profInfo.getSignedTotalDistance();
+            
+            std::vector<double> startPose = this->profInfo[this->execProfId].getStartPose();
+            std::vector<double> signedTotalDis = this->profInfo[this->execProfId].getSignedTotalDistance();
 
             for (size_t i=0;i<this->dof;i++){
                 this->curPose[i] = startPose[i] + signedTotalDis[i] * rate;
+                //std::cout << "651:" << this->curPose[i] << ":" << startPose[i] << ":" << signedTotalDis[i] << ":" << rate << std::endl;
             }
 
-            if (this->isEnableToExecImposedProf(&this->profContainer[this->execProfId], &this->profContainer[this->imposedProfId])) {
-                if (this->profContainer[this->imposedProfId].calDis(cycleTime)){
-                    double ipDis = this->profContainer[this->imposedProfId].getCurDis();
-                    double ipBaseCoordinate = this->profContainer[this->imposedProfId].profInfo.getBaseCoordinate();
-                    std::vector<double> ipTotalDis = this->profContainer[this->imposedProfId].profInfo.getUnsignedTotalDistance();
+            if (this->isEnableToExecImposedProf()) {
+            //&this->profContainer[this->execProfId], &this->profContainer[this->imposedProfId])) {
+                if (this->imposedProf->calDis(cycleTime)){
+                    double ipDis = this->imposedProf->getCurDis();
+                    double ipBaseCoordinate = this->profInfo[this->imposedProfId].getBaseCoordinate();
+                    std::vector<double> ipTotalDis = this->profInfo[this->imposedProfId].getUnsignedTotalDistance();
                     double ipRate = ipDis / ipTotalDis[ipBaseCoordinate];  
 
-                    std::vector<double> signedTotalDis = this->profContainer[this->imposedProfId].profInfo.getSignedTotalDistance();
+                    std::vector<double> signedTotalDis = this->profInfo[this->imposedProfId].getSignedTotalDistance();
                     for (size_t i=0;i<this->dof;i++){
                         this->curPose[i] += signedTotalDis[i] * ipRate;
                     }
@@ -635,9 +681,9 @@ public:
             }
         }
 
-        if (this->execProfId != -1 && this->profContainer[this->execProfId].isDone()){
+        if (this->execProf->isDone()){
             if (this->imposedProfId == -1) {
-                std::vector<double> endPos = this->profContainer[this->execProfId].profInfo.getTargetPose();
+                std::vector<double> endPos = this->profInfo[this->execProfId].getTargetPose();
                 for (size_t i=0;i<this->dof;i++) {
                     this->curVels[i] = 0.0;
                     this->preVels[i] = 0.0;
@@ -648,17 +694,18 @@ public:
             }
             else {
                 this->execProfId = this->imposedProfId;
+                this->execProf = this->imposedProf;
+                this->imposedProf = nullptr;
                 this->imposedProfId = -1;
             }
         }
-
         return true;
 
     }
 
 };
 
-
+/*
 bool testCase01() {
     TrapezoidalProfile prof;
 
@@ -678,7 +725,7 @@ bool testCase01() {
 
     if (!file.is_open()) {
         std::cerr << "Error: Could not open file " << filename << std::endl;
-        return 1;
+        return false;
     }
 
     if (!prof.makeProf(acc,dec,vel,tarPos - startPos)) return false;
@@ -694,10 +741,6 @@ bool testCase01() {
         }
 
         double dis = prof.getCurDis();
-        /*
-        std::cout << dis << std::endl;
-        std::cout << row[0] << std::endl;
-        */
         if (abs(dis - std::stof(row[0]) > 0.0001)) {
             return false;
         }
@@ -707,15 +750,9 @@ bool testCase01() {
         return false;
     }
 
-    return true;
-/*
-    if (prof.makeProf(acc,dec,vel,tarPos - startPos)) {
+    file.close();
 
-        while (prof.calDis(cycleTime)) {
-            std::cout << prof.getCurDis() << std::endl;
-        }
-    }
-*/
+    return true;
 }
 
 bool testCase02() {
@@ -754,11 +791,6 @@ bool testCase02() {
 
         double dis = prof.getCurDis();
         
-        /*
-        std::cout << dis << std::endl;
-        std::cout << row[0] << std::endl;
-        */
-
         if (abs(dis - std::stof(row[0]) > 0.0001)) {
             return false;
         }
@@ -768,15 +800,17 @@ bool testCase02() {
         return false;
     }
 
+    file.close();
+
     return true;
 
 }
 
 bool testCase101(void){
-        
+    std::cout << "call testCase101" << std::endl;    
     int dof = 6;
     Profiler profiler(dof);
-
+    std::cout << "802" << std::endl;    
     std::vector<double> curPose;
     curPose.push_back(1.5708f);
     curPose.push_back(-3.14159f);
@@ -810,7 +844,6 @@ bool testCase101(void){
     targetAccsRad.push_back(26.17993878f);
     targetAccsRad.push_back(26.17993878f);
     targetAccsRad.push_back(34.90658504f);
-
     profiler.setCmd(targetPose, targetVelsRad, targetAccsRad, targetAccsRad);
 
     double cycleTime = 0.01;
@@ -824,7 +857,7 @@ bool testCase101(void){
         std::cerr << "Error: Could not open file " << filename << std::endl;
         return 1;
     }
-
+    std::cout << "868" << std::endl;
     std::string line;
     while (std::getline(file, line) && profiler.execCmd(cycleTime)) { // Read the file line by line
         std::stringstream ss(line);   // Use stringstream to parse the line
@@ -1268,13 +1301,152 @@ bool testCase_203(){
     return true;
 
 }
+*/
+bool testCase301(void){
+        
+    int dof = 6;
+    MotionController mc(dof);
 
+    ScurveProfile* execPorf = new ScurveProfile();
+    ScurveProfile* imposedProf = new ScurveProfile();
+
+    mc.setProfile(execPorf);
+    mc.setImposedProfile(imposedProf);
+
+    std::vector<double> curPose;
+    curPose.push_back(1.5708f);
+    curPose.push_back(-3.14159f);
+    curPose.push_back(1.5708f);
+    curPose.push_back(0.0f);
+    curPose.push_back(0.0f);
+    curPose.push_back(0.0f);
+
+    mc.setCurrentPose(curPose);
+
+    std::vector<double> targetPose;
+
+    targetPose.push_back(0.0f);
+    targetPose.push_back(0.0f);
+    targetPose.push_back(1.5708f);
+    targetPose.push_back(0.0f);
+    targetPose.push_back(0.0f);
+    targetPose.push_back(0.0f);
+
+    std::vector<double> targetVelsRad;
+    targetVelsRad.push_back(5.23598776f);
+    targetVelsRad.push_back(5.23598776f);
+    targetVelsRad.push_back(6.54498469f);
+    targetVelsRad.push_back(6.54498469f);
+    targetVelsRad.push_back(6.54498469f);
+    targetVelsRad.push_back(10.47197551f);
+
+    std::vector<double> targetAccsRad;
+    targetAccsRad.push_back(17.45329252f);
+    targetAccsRad.push_back(17.45329252f);
+    targetAccsRad.push_back(26.17993878f);
+    targetAccsRad.push_back(26.17993878f);
+    targetAccsRad.push_back(26.17993878f);
+    targetAccsRad.push_back(34.90658504f);
+
+    mc.setCmd(targetPose, targetVelsRad, targetAccsRad, targetAccsRad);
+
+    targetPose[0] = 0.0;
+    targetPose[1] = 0.0;
+    targetPose[2] = 0.0;
+    targetPose[3] = 0.0;
+    targetPose[4] = 0.0;
+    targetPose[5] = 0.0;
+    
+    mc.setCmd(targetPose, targetVelsRad, targetAccsRad, targetAccsRad);
+
+    double cycleTime = 0.01;
+
+    std::vector<double> cmdPose = curPose;
+    std::vector<double> prePose = curPose;
+    std::vector<double> cmdVels;
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+
+    std::vector<double> preVels = cmdVels;
+    std::vector<double> cmdAccs = cmdVels;
+
+
+    std::string filenamep = "./testCase/case301_pose.csv";
+    //std::string filenamev = "./testCase/case301_vels.csv";
+    //std::string filenamea = "./testCase/case301_accs.csv";
+
+    std::ifstream filep(filenamep);
+    //std::ifstream filev(filenamev);
+    //std::ifstream filea(filenamea);
+
+    if (!filep.is_open()) {
+        std::cerr << "Error: Could not open file " << std::endl;
+        return false;
+    }
+
+/*
+    std::ofstream foutp;
+    std::ofstream foutv;
+    std::ofstream fouta;
+
+    foutp.open(filenamep);
+    foutv.open(filenamev);
+    fouta.open(filenamea);
+*/
+//    std::string line;
+
+    std::string line;
+    while (std::getline(filep, line) && mc.execCmd(cycleTime)) { // Read the file line by line
+        std::stringstream ss(line);
+        std::string value;
+        std::vector<std::string> row;
+
+        while (std::getline(ss, value, ',')) {
+            row.push_back(value);
+        }
+
+        cmdPose = mc.getCmdPose();
+
+        for (size_t i=0;i<dof;i++) {
+            if (abs(cmdPose[i] - std::stof(row[i])) > 0.0001) return false;
+        }
+            
+        for (size_t i=0;i<dof;i++) {
+            cmdVels[i] = (cmdPose[i] - prePose[i]) / cycleTime;
+            cmdAccs[i] = (cmdVels[i] - preVels[i]) / cycleTime;
+
+            //std::cout << cmdAccs[i] << ",";
+            //foutp << cmdPose[i] << ",";
+            //foutv << cmdVels[i] << ",";
+            //fouta << cmdAccs[i] << ",";
+
+            prePose[i] = cmdPose[i];
+            preVels[i] = cmdVels[i];
+        }
+        //std::cout << std::endl;
+        //foutp << std::endl;
+        //foutv << std::endl;
+        //fouta << std::endl;
+
+    }
+
+    cmdPose = mc.getCmdPose();
+
+    for (size_t i=0;i<dof;i++) {
+        if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
+    }
+
+    return true;
+}
 
 int main(){
 
-
     int count = 0;
-
+/*
     count++;
     if (testCase01()) std::cout << "PATH:" << count << std::endl;
     else std::cout << "NG:" << count << std::endl;
@@ -1297,6 +1469,7 @@ int main(){
 
 //    testCaseXXX()
 
+
     count = 201;
     if (testCase_201()) std::cout << "PATH:" << count << std::endl;
     else std::cout << "NG:" << count << std::endl;
@@ -1308,5 +1481,9 @@ int main(){
     count++;
     if (testCase_203()) std::cout << "PATH:" << count << std::endl;
     else std::cout << "NG:" << count << std::endl;
+*/
+    if (testCase301()) std::cout << "PATH:" << count << std::endl;
+    else std::cout << "NG:" << count << std::endl;
+
 
 }
