@@ -24,6 +24,5 @@ bool testCase_201();
 bool testCase_202();
 bool testCase_203();
 bool testCase301();
-bool testCaseXXX();
 
 #endif // TESTSUITE_H

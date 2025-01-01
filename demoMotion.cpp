@@ -38,9 +38,8 @@ int main(){
     if (testCase_203()) cout << "PATH:" << count << endl;
     else cout << "NG:" << count << endl;
 
+    count = 301;
     if (testCase301()) cout << "PATH:" << count << endl;
     else cout << "NG:" << count << endl;
-
-    //testCaseXXX();
 
 }

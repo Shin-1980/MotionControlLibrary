@@ -22,7 +22,6 @@ bool ScurveProfile::isDone(void){
         return true;
     else
         return false;
-
 }
 
 bool ScurveProfile::isDecelerating(void) {

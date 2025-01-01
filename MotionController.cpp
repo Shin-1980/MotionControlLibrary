@@ -14,12 +14,12 @@ MotionController::MotionController(int degreesOfFreedom):
 {
 }
 
-void MotionController::setScurveProfile(ScurveProfile* &prof) 
+void MotionController::setScurveProfile(shared_ptr<ScurveProfile> prof) 
 {
     this->profContainer.push_back(prof);
 }
 
-void MotionController::setTrapezoidalProfile(TrapezoidalProfile* &prof) 
+void MotionController::setTrapezoidalProfile(shared_ptr<TrapezoidalProfile> prof) 
 {
     this->profContainer.push_back(prof);
 }
@@ -55,7 +55,7 @@ vector<double> MotionController::getCmdAccs(void){
     return this->curAccs;
 }
 
-bool MotionController::makeLinearProf(TrajectoryProfile* &prof, CommandInfo* cmdInfo, vector<double> startPose) {
+bool MotionController::makeLinearProf(shared_ptr<TrajectoryProfile> prof, CommandInfo* cmdInfo, vector<double> startPose) {
     
     cmdInfo->setStartPose(startPose);
 

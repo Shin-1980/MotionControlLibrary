@@ -102,7 +102,7 @@ bool testCase101(void){
     int dof = 6;
     MotionController mc(dof);
 
-    TrapezoidalProfile* execProf1 = new TrapezoidalProfile();
+    shared_ptr<TrapezoidalProfile> execProf1 = make_shared<TrapezoidalProfile>();
 
     mc.setTrapezoidalProfile(execProf1);
 
@@ -175,7 +175,7 @@ bool testCase101(void){
         if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
     }
 
-    delete(execProf1);
+    execProf1.reset();
 
     return true;
 }
@@ -185,7 +185,7 @@ bool testCase102(void){
     int dof = 6;
     MotionController mc(dof);
 
-    TrapezoidalProfile* execProf = new TrapezoidalProfile();
+    shared_ptr<TrapezoidalProfile> execProf = make_shared<TrapezoidalProfile>();
     mc.setTrapezoidalProfile(execProf);
 
     vector<double> curPose;
@@ -263,7 +263,7 @@ bool testCase102(void){
         if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
     }
 
-    delete(execProf);
+    execProf.reset();
 
     return true;
 }
@@ -272,9 +272,9 @@ bool testCase109(){
     int dof = 6;
     MotionController mc(dof);
 
-    TrapezoidalProfile* execProf1 = new TrapezoidalProfile();
-    TrapezoidalProfile* execProf2 = new TrapezoidalProfile();
-    TrapezoidalProfile* execProf3 = new TrapezoidalProfile();
+    shared_ptr<TrapezoidalProfile> execProf1 = make_shared<TrapezoidalProfile>();
+    shared_ptr<TrapezoidalProfile> execProf2 = make_shared<TrapezoidalProfile>();
+    shared_ptr<TrapezoidalProfile> execProf3 = make_shared<TrapezoidalProfile>();
 
     mc.setTrapezoidalProfile(execProf1);
     mc.setTrapezoidalProfile(execProf2);
@@ -382,10 +382,9 @@ bool testCase109(){
         if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
     }
 
-    delete(execProf1);
-    delete(execProf2);
-    delete(execProf3);
-
+    execProf1.reset();
+    execProf2.reset();
+    execProf3.reset();
 
     return true;
 
@@ -556,9 +555,10 @@ bool testCase301(void){
     int dof = 6;
     MotionController mc(dof);
 
-    ScurveProfile* execProf1 = new ScurveProfile();
+    shared_ptr<ScurveProfile> execProf1 = make_shared<ScurveProfile>();
+    shared_ptr<ScurveProfile> execProf2 = make_shared<ScurveProfile>();
+
     mc.setScurveProfile(execProf1);
-    ScurveProfile* execProf2 = new ScurveProfile();
     mc.setScurveProfile(execProf2);
 
     vector<double> curPose;
@@ -685,98 +685,8 @@ bool testCase301(void){
         if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
     }
 
-    delete(execProf1);
-    delete(execProf2);
+    execProf1.reset();
+    execProf2.reset();
 
     return true;
-}
-
-bool testCaseXXX(){
-    int dof = 6;
-    MotionController mc(dof);
-
-    ScurveProfile* execProf1 = new ScurveProfile();
-    mc.setScurveProfile(execProf1);
-    ScurveProfile* execProf2 = new ScurveProfile();
-    mc.setScurveProfile(execProf2);
-    ScurveProfile* execProf3 = new ScurveProfile();
-    mc.setScurveProfile(execProf3);
-
-
-    vector<double> curPose;
-    curPose.push_back(1.5708f);
-    curPose.push_back(-3.14159f);
-    curPose.push_back(1.5708f);
-    curPose.push_back(0.0f);
-    curPose.push_back(0.0f);
-    curPose.push_back(0.0f);
-
-    mc.setCurrentPose(curPose);
-
-    vector<double> targetPose;
-    targetPose.push_back(1.68019f);
-    targetPose.push_back(-2.35679f);
-    targetPose.push_back(2.45324f);
-    targetPose.push_back(2.56348f);
-    targetPose.push_back(-0.904948f);
-    targetPose.push_back(3.63343f);
-
-    vector<double> targetVelsRad;
-    targetVelsRad.push_back(5.23598776f);
-    targetVelsRad.push_back(5.23598776f);
-    targetVelsRad.push_back(6.54498469f);
-    targetVelsRad.push_back(6.54498469f);
-    targetVelsRad.push_back(6.54498469f);
-    targetVelsRad.push_back(10.47197551f);
-
-    vector<double> targetAccsRad;
-    targetAccsRad.push_back(17.45329252f);
-    targetAccsRad.push_back(17.45329252f);
-    targetAccsRad.push_back(26.17993878f);
-    targetAccsRad.push_back(26.17993878f);
-    targetAccsRad.push_back(26.17993878f);
-    targetAccsRad.push_back(34.90658504f);
-
-    mc.setCmd(targetPose, targetVelsRad, targetAccsRad);
-
-    targetPose[0] = 0.0;
-    targetPose[1] = 0.0;
-    targetPose[2] = 1.5708;
-    targetPose[3] = 0.0;
-    targetPose[4] = 0.0;
-    targetPose[5] = 0.0;
-    mc.setCmd(targetPose, targetVelsRad, targetAccsRad);
-
-    double cycleTime = 0.1;
-
-    vector<double> cmdPose = curPose;
-
-    for (size_t i=0;i<dof;i++) {
-        cout << "vertex[" << i << "] = " << curPose[i] << ';' << endl;
-    }   
-    cout << endl;
-     
-    while (mc.execCmd(cycleTime)) { 
-        cmdPose = mc.getCmdPose();
-        for (size_t i=0;i<dof;i++) {
-            cout << "vertex[" << i << "] = " << cmdPose[i] << ';' << endl;
-        }   
-        cout << endl;
-    }
-
-    if (mc.execCmd(cycleTime)) return false;
-
-    cmdPose = mc.getCmdPose();
-
-    for (size_t i=0;i<dof;i++) {
-        cout << "vertex[" << i << "] = " << cmdPose[i] << ';' << endl;
-    }   
-    cout << endl;
-
-    delete(execProf1);
-    delete(execProf2);
-    delete(execProf3);
-
-    return true;
-
 }
