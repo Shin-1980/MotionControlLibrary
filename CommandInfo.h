@@ -8,6 +8,7 @@ using namespace std;
 class CommandInfo{
 public:
     CommandInfo();
+    ~CommandInfo();
     
     void setVelocityProfParam(vector<double> targetPose, vector<double> targetVels, vector<double> targetAccs, vector<double> targetJerks);
     void setStartPose(std::vector<double> startPose);

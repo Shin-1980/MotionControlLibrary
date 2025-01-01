@@ -27,6 +27,7 @@ public:
     CommandInfo cmdInfo;
 
     TrapezoidalProfile();
+    ~TrapezoidalProfile();
     double getCurDis(void);
     bool isDone(void);
     bool isDecelerating(void); 

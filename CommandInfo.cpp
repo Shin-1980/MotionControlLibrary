@@ -11,6 +11,10 @@ CommandInfo::CommandInfo() :
 {
 }
 
+CommandInfo::~CommandInfo()
+{
+}
+
 void CommandInfo::setVelocityProfParam(vector<double> targetPose, vector<double> targetVels, vector<double> targetAccs, vector<double> targetJerks)
 {
     this->targetPose = targetPose;

@@ -8,3 +8,6 @@ TrajectoryProfile::TrajectoryProfile() :
 {
 }
 
+TrajectoryProfile::~TrajectoryProfile()
+{
+}

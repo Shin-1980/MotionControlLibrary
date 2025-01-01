@@ -14,6 +14,11 @@ MotionController::MotionController(int degreesOfFreedom):
 {
 }
 
+MotionController::~MotionController()
+{
+    profContainer.clear();
+}
+
 void MotionController::setScurveProfile(shared_ptr<ScurveProfile> prof) 
 {
     this->profContainer.push_back(prof);

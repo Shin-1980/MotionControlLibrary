@@ -17,6 +17,10 @@ TrapezoidalProfile::TrapezoidalProfile():
 {    
 }
 
+TrapezoidalProfile::~TrapezoidalProfile()
+{
+}
+
 double TrapezoidalProfile::getCurDis(void)
 {
     return this->curDis;

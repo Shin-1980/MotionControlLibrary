@@ -10,6 +10,7 @@ class ScurveProfile : public TrajectoryProfile
 {
 public:
     ScurveProfile();
+    ~ScurveProfile();
     double getCurDis(void);
     bool isDone(void);
     bool isDecelerating(void);

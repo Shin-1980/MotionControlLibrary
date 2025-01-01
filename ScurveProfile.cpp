@@ -12,6 +12,9 @@ ScurveProfile::ScurveProfile():
 {
 }
 
+ScurveProfile::~ScurveProfile()
+{}
+
 double ScurveProfile::getCurDis(void){
     return this->curDis;
 }

@@ -14,6 +14,7 @@ class MotionController
 {
 public:
     MotionController(int degreesOfFreedom);
+    ~MotionController();
     void setScurveProfile(shared_ptr<ScurveProfile> prof);
     void setTrapezoidalProfile(shared_ptr<TrapezoidalProfile> prof);
     void setCurrentPose(vector<double> curPose);

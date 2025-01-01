@@ -12,6 +12,7 @@ public:
     double accTime;
 
     TrajectoryProfile();
+    ~TrajectoryProfile();
 
     virtual double getCurDis() = 0;
     virtual bool isDone() = 0;
