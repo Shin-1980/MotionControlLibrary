@@ -1,6 +1,6 @@
 #include "TestSuite.h"
 
-bool testCase01() {
+bool testCase_TrapezoidalProfile_001() {
     TrapezoidalProfile prof;
 
     double startPos = 0.0;
@@ -48,7 +48,7 @@ bool testCase01() {
     return true;
 }
 
-bool testCase02() {
+bool testCase_TrapezoidalProfile_002() {
     TrapezoidalProfile prof;
 
     double startPos = 0.0;
@@ -98,7 +98,79 @@ bool testCase02() {
 
 }
 
-bool testCase101(void){
+bool testCase_TrapezoidalProfile_003() {
+    TrapezoidalProfile prof;
+
+    double cycleTime = 0.01;
+
+    if(prof.calDis(cycleTime) == false) return true;
+
+    return false;
+}
+
+bool testCase_TrapezoidalProfile_004() {
+    TrapezoidalProfile prof;
+
+    if (prof.getCurDis() == 0.0) return true;
+
+    return false;
+}
+
+bool testCase_TrapezoidalProfile_005() {
+    TrapezoidalProfile prof;
+
+    double startPos = 0.0;
+    double tarPos = -25;
+    double acc = 100;
+    double vel = 100;
+    double cycleTime = 0.1;
+    double prePos = startPos;
+    double curPos = startPos;
+    double preVel = 0;
+    double curVel = 0;
+
+    if (!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0)) return true;
+
+    return false;
+}
+
+bool testCase_TrapezoidalProfile_006() {
+    TrapezoidalProfile prof;
+
+    double startPos = 0.0;
+    double tarPos = 25;
+    double acc = -100;
+    double vel = 100;
+    double cycleTime = 0.1;
+    double prePos = startPos;
+    double curPos = startPos;
+    double preVel = 0;
+    double curVel = 0;
+
+    if (!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0)) return true;
+
+    return false;
+}
+
+bool testCase_TrapezoidalProfile_007() {
+    TrapezoidalProfile prof;
+
+    double startPos = 0.0;
+    double tarPos = 25;
+    double acc = 100;
+    double vel = -100;
+    double cycleTime = 0.1;
+    double prePos = startPos;
+    double curPos = startPos;
+    double preVel = 0;
+    double curVel = 0;
+
+    if (!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0)) return true;
+
+    return false;
+}
+
+bool testCase_TrapezoidalProfile_101(void){
     int dof = 6;
     MotionController mc(dof);
 
@@ -183,7 +255,7 @@ bool testCase101(void){
     return true;
 }
 
-bool testCase102(void){
+bool testCase_TrapezoidalProfile_102(void){
         
     int dof = 6;
     MotionController mc(dof);
@@ -273,7 +345,17 @@ bool testCase102(void){
     return true;
 }
 
-bool testCase109(){
+bool testCase_TrapezoidalProfile_103(){
+    int dof = 6;
+    MotionController mc(dof);
+
+    double cycleTime = 0.01;
+    
+    if (mc.execCmd(cycleTime) == false) return true;
+    return false;
+}
+
+bool testCase_TrapezoidalProfile_104(){
     int dof = 6;
     MotionController mc(dof);
 
@@ -399,7 +481,7 @@ bool testCase109(){
 }
 
 
-bool testCase_201(){
+bool testCase_ScurveProfile_001(){
 
     ScurveProfile sc;
     // acc, dec, vel, pos
@@ -452,7 +534,7 @@ bool testCase_201(){
 
 }
 
-bool testCase_202(){
+bool testCase_ScurveProfile_002(){
 
     ScurveProfile sc;
     // acc, dec, vel, pos
@@ -505,7 +587,7 @@ bool testCase_202(){
 
 }
 
-bool testCase_203(){
+bool testCase_ScurveProfile_003(){
 
     ScurveProfile sc;
     // acc, dec, vel, pos
@@ -558,7 +640,93 @@ bool testCase_203(){
 
 }
 
-bool testCase301(void){
+bool testCase_ScurveProfile_004() {
+    TrapezoidalProfile prof;
+
+    if (prof.getCurDis() == 0.0) return true;
+
+    return false;
+}
+
+bool testCase_ScurveProfile_005() {
+    TrapezoidalProfile prof;
+
+    double startPos = 0.0;
+    double tarPos = -25;
+    double acc = 100;
+    double vel = 100;
+    double jerk = 100;
+    double cycleTime = 0.1;
+    double prePos = startPos;
+    double curPos = startPos;
+    double preVel = 0;
+    double curVel = 0;
+
+    if (!prof.makeVelProf(tarPos - startPos, vel, acc, jerk)) return true;
+
+    return false;
+}
+
+bool testCase_ScurveProfile_006() {
+    TrapezoidalProfile prof;
+
+    double startPos = 0.0;
+    double tarPos = 25;
+    double acc = -100;
+    double vel = 100;
+    double jerk = 100;
+    double cycleTime = 0.1;
+    double prePos = startPos;
+    double curPos = startPos;
+    double preVel = 0;
+    double curVel = 0;
+
+    if (!prof.makeVelProf(tarPos - startPos, vel, acc, jerk)) return true;
+
+    return false;
+}
+
+bool testCase_ScurveProfile_007() {
+    ScurveProfile prof;
+
+    double startPos = 0.0;
+    double tarPos = 25;
+    double acc = 100;
+    double vel = -100;
+    double jerk = 100;
+    double cycleTime = 0.1;
+    double prePos = startPos;
+    double curPos = startPos;
+    double preVel = 0;
+    double curVel = 0;
+
+    if (!prof.makeVelProf(tarPos - startPos, vel, acc, jerk)) return true;
+
+    return false;
+}
+
+bool testCase_ScurveProfile_008() {
+    ScurveProfile prof;
+
+    double startPos = 0.0;
+    double tarPos = 25;
+    double acc = 100;
+    double vel = 100;
+    double jerk = -100;
+    double cycleTime = 0.1;
+    double prePos = startPos;
+    double curPos = startPos;
+    double preVel = 0;
+    double curVel = 0;
+
+    if (!prof.makeVelProf(tarPos - startPos, vel, acc, jerk)) return true;
+
+    return false;
+}
+
+
+
+bool testCase_ScurveProfile_101(void){
         
     int dof = 6;
     MotionController mc(dof);

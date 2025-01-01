@@ -15,14 +15,28 @@ using namespace std;
 #include "TrapezoidalProfile.h"
 #include "ScurveProfile.h"
 
-bool testCase01();
-bool testCase02();
-bool testCase101();
-bool testCase102();
-bool testCase109();
-bool testCase_201();
-bool testCase_202();
-bool testCase_203();
-bool testCase301();
+bool testCase_TrapezoidalProfile_001();
+bool testCase_TrapezoidalProfile_002();
+bool testCase_TrapezoidalProfile_003();
+bool testCase_TrapezoidalProfile_004();
+bool testCase_TrapezoidalProfile_005();
+bool testCase_TrapezoidalProfile_006();
+bool testCase_TrapezoidalProfile_007();
+
+bool testCase_TrapezoidalProfile_101();
+bool testCase_TrapezoidalProfile_102();
+bool testCase_TrapezoidalProfile_103();
+bool testCase_TrapezoidalProfile_104();
+
+bool testCase_ScurveProfile_001();
+bool testCase_ScurveProfile_002();
+bool testCase_ScurveProfile_003();
+bool testCase_ScurveProfile_004();
+bool testCase_ScurveProfile_005();
+bool testCase_ScurveProfile_006();
+bool testCase_ScurveProfile_007();
+bool testCase_ScurveProfile_008();
+
+bool testCase_ScurveProfile_101();
 
 #endif // TESTSUITE_H
