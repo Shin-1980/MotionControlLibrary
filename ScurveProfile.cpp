@@ -35,6 +35,9 @@ bool ScurveProfile::isDecelerating(void) {
 
 bool ScurveProfile::makeVelProf(double dis, double vel, double acc, double jerk) {
 
+    if (dis <= 0 || vel <= 0 || acc <= 0 || jerk <= 0)
+        return false;
+
     this->jerk = jerk;
     this->accDec = acc; 
     this->targetVel = vel;

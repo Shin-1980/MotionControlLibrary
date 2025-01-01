@@ -485,7 +485,7 @@ bool testCase_ScurveProfile_001(){
 
     ScurveProfile sc;
     // acc, dec, vel, pos
-    if (!sc.makeVelProf(100,5,1,0.0)) return false;
+    if (!sc.makeVelProf(100,5,1,1.0)) return false;
 
     double cycleTime = 0.2;
     double curPos = 0.0;
@@ -538,7 +538,7 @@ bool testCase_ScurveProfile_002(){
 
     ScurveProfile sc;
     // acc, dec, vel, pos
-    if(!sc.makeVelProf(0.25, 5, 1, 0.0)) return false;
+    if(!sc.makeVelProf(0.25, 5, 1, 1.0)) return false;
 
     double cycleTime = 0.2;
     double curPos = 0.0;
@@ -591,7 +591,7 @@ bool testCase_ScurveProfile_003(){
 
     ScurveProfile sc;
     // acc, dec, vel, pos
-    if (!sc.makeVelProf(10, 100, 1, 0.0)) return false;
+    if (!sc.makeVelProf(10, 100, 1, 1.0)) return false;
 
     double cycleTime = 0.2;
     double curPos = 0.0;
