@@ -9,6 +9,14 @@ using namespace std;
 class ScurveProfile : public TrajectoryProfile
 {
 public:
+    ScurveProfile();
+    double getCurDis(void);
+    bool isDone(void);
+    bool isDecelerating(void);
+    bool makeProf(double acc, double vel, double dis);
+    bool calDis(double cycleTime);
+
+private:
     bool isCreated;
 
     double  initTime[7];
@@ -26,14 +34,6 @@ public:
     double jerk;
     double curDis;
 
-    ScurveProfile();
-    double getCurDis(void);
-    bool isDone(void);
-    bool isDecelerating(void);
-    bool makeProf(double acc, double vel, double dis);
-    bool calDis(double cycleTime);
-
-private:
     void fillAllProfile(); 
 
 };

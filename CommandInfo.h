@@ -7,13 +7,6 @@ using namespace std;
 
 class CommandInfo{
 public:
-    int dof;
-    int baseCoordinate;
-    std::vector<double> targetPose;
-    std::vector<double> targetVels;
-    std::vector<double> targetAccs;
-    std::vector<double> startPose;
-
     CommandInfo();
     void setParam(std::vector<double> targetPose, std::vector<double> targetVels, std::vector<double> targetAccs);
     void setStartPose(std::vector<double> startPose);
@@ -25,6 +18,15 @@ public:
     int getBaseCoordinate(void);
     std::vector<double> getUnsignedTotalDistance(void);
     std::vector<double> getSignedTotalDistance(void);
+
+private:
+   int dof;
+    int baseCoordinate;
+    std::vector<double> targetPose;
+    std::vector<double> targetVels;
+    std::vector<double> targetAccs;
+    std::vector<double> startPose;
+
 };
 
 #endif //COMMANDINFO_H
