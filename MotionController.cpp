@@ -1,6 +1,5 @@
 #include "MotionController.h"
 
-
 MotionController::MotionController(int degreesOfFreedom):
     dof(degreesOfFreedom),        
     execProfId(-1),
@@ -25,44 +24,44 @@ void MotionController::setTrapezoidalProfile(TrapezoidalProfile* &prof)
     this->profContainer.push_back(prof);
 }
 
-void MotionController::setCurrentPose(std::vector<double> curPose)
+void MotionController::setCurrentPose(vector<double> curPose)
 {
     this->curPose = curPose;
     this->prePose = curPose;
 }
 
-void MotionController::setCmd(std::vector<double> targetPose, std::vector<double> targetVels, std::vector<double> targetAccs)
+void MotionController::setCmd(vector<double> targetPose, vector<double> targetVels, vector<double> targetAccs)
 {
     CommandInfo cmd;
     this->cmdContainer.push_back(cmd);
 
     if (this->storedProfNum > this->maxProfNum) {
-        //std::cout << "The number of profiler exceeds the limit" << std::endl;
+        //cout << "The number of profiler exceeds the limit" << endl;
     }
 
     this->cmdContainer[this->storedProfNum].setParam(targetPose, targetVels, targetAccs);
     this->storedProfNum++;
 }
 
-std::vector<double> MotionController::getCmdPose(void){
+vector<double> MotionController::getCmdPose(void){
     return this->curPose;
 }
 
-std::vector<double> MotionController::getCmdVels(void){
+vector<double> MotionController::getCmdVels(void){
     return this->curVels;
 }
 
-std::vector<double> MotionController::getCmdAccs(void){
+vector<double> MotionController::getCmdAccs(void){
     return this->curAccs;
 }
 
-bool MotionController::makeLinearProf(TrajectoryProfile* &prof, CommandInfo* cmdInfo, std::vector<double> startPose) {
+bool MotionController::makeLinearProf(TrajectoryProfile* &prof, CommandInfo* cmdInfo, vector<double> startPose) {
     
     cmdInfo->setStartPose(startPose);
 
-    std::vector<double> times(this->dof, 0.0f);
-    std::vector<double> unsignedTotalDis = cmdInfo->getUnsignedTotalDistance();
-    std::vector<double> targetVel = cmdInfo->getTargetVels();
+    vector<double> times(this->dof, 0.0f);
+    vector<double> unsignedTotalDis = cmdInfo->getUnsignedTotalDistance();
+    vector<double> targetVel = cmdInfo->getTargetVels();
 
     for(size_t i=0; i<this->dof; i++) {
         times[i] = unsignedTotalDis[i] / targetVel[i];
@@ -77,9 +76,9 @@ bool MotionController::makeLinearProf(TrajectoryProfile* &prof, CommandInfo* cmd
         }
     }
 
-    std::vector<double> accs = cmdInfo->getTargetAccs();
-    std::vector<double> vels = cmdInfo->getTargetVels();
-    std::vector<double> diss = cmdInfo->getUnsignedTotalDistance();
+    vector<double> accs = cmdInfo->getTargetAccs();
+    vector<double> vels = cmdInfo->getTargetVels();
+    vector<double> diss = cmdInfo->getUnsignedTotalDistance();
 
     for (size_t i=0;i<this->dof;i++){
         if (accs[i] < 0 || vels[i] < 0)
@@ -132,12 +131,12 @@ bool MotionController::execCmd(double cycleTime) {
     if (isExec){
         double curDis = this->profContainer[this->execProfId]->getCurDis();
         int baseCoordinate = this->cmdContainer[this->execProfId].getBaseCoordinate();
-        std::vector<double> totalDis = this->cmdContainer[this->execProfId].getUnsignedTotalDistance();
+        vector<double> totalDis = this->cmdContainer[this->execProfId].getUnsignedTotalDistance();
 
         double rate = curDis / totalDis[baseCoordinate];
         
-        std::vector<double> startPose = this->cmdContainer[this->execProfId].getStartPose();
-        std::vector<double> signedTotalDis = this->cmdContainer[this->execProfId].getSignedTotalDistance();
+        vector<double> startPose = this->cmdContainer[this->execProfId].getStartPose();
+        vector<double> signedTotalDis = this->cmdContainer[this->execProfId].getSignedTotalDistance();
 
         for (size_t i=0;i<this->dof;i++){
             this->curPose[i] = startPose[i] + signedTotalDis[i] * rate;
@@ -151,10 +150,10 @@ bool MotionController::execCmd(double cycleTime) {
         if (this->profContainer[this->imposedProfId]->calDis(cycleTime)){
             double ipDis = this->profContainer[imposedProfId]->getCurDis();
             double ipBaseCoordinate = this->cmdContainer[this->imposedProfId].getBaseCoordinate();
-            std::vector<double> ipTotalDis = this->cmdContainer[this->imposedProfId].getUnsignedTotalDistance();
+            vector<double> ipTotalDis = this->cmdContainer[this->imposedProfId].getUnsignedTotalDistance();
             double ipRate = ipDis / ipTotalDis[ipBaseCoordinate];  
 
-            std::vector<double> signedTotalDis = this->cmdContainer[this->imposedProfId].getSignedTotalDistance();
+            vector<double> signedTotalDis = this->cmdContainer[this->imposedProfId].getSignedTotalDistance();
             for (size_t i=0;i<this->dof;i++){
                 this->curPose[i] += signedTotalDis[i] * ipRate;
             }
@@ -171,7 +170,7 @@ bool MotionController::execCmd(double cycleTime) {
 
     if (this->profContainer[this->execProfId]->isDone()){
         if (this->imposedProfId == -1) {
-            std::vector<double> endPos = this->cmdContainer[this->execProfId].getTargetPose();
+            vector<double> endPos = this->cmdContainer[this->execProfId].getTargetPose();
             for (size_t i=0;i<this->dof;i++) {
                 this->curVels[i] = 0.0;
                 this->preVels[i] = 0.0;

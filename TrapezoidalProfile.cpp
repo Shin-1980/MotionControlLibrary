@@ -43,8 +43,8 @@ bool TrapezoidalProfile::makeProf(double acc, double vel, double dis)
     if (acc <= 0 || vel <= 0 || dis <= 0)
         return false;
 
-    this->acc = std::abs(acc);
-    this->targetVel = std::abs(vel);
+    this->acc = abs(acc);
+    this->targetVel = abs(vel);
 
     this->totalDis = abs(dis); 
     this->elapsedTime = 0;

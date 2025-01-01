@@ -13,28 +13,28 @@ bool testCase01() {
     double preVel = 0;
     double curVel = 0;
 
-    std::string filename = "./testCase/case1.csv";
-    std::ifstream file(filename);
+    string filename = "./testCase/case1.csv";
+    ifstream file(filename);
 
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open file " << filename << std::endl;
+        cerr << "Error: Could not open file " << filename << endl;
         return false;
     }
 
     if (!prof.makeProf(acc,vel,tarPos - startPos)) return false;
 
-    std::string line;
-    while (std::getline(file, line) && prof.calDis(cycleTime)) { // Read the file line by line
-        std::stringstream ss(line);   // Use stringstream to parse the line
-        std::string value;
-        std::vector<std::string> row; // Store the values of the current row
+    string line;
+    while (getline(file, line) && prof.calDis(cycleTime)) { // Read the file line by line
+        stringstream ss(line);   // Use stringstream to parse the line
+        string value;
+        vector<string> row; // Store the values of the current row
 
-        while (std::getline(ss, value, ',')) { // Split by comma
+        while (getline(ss, value, ',')) { // Split by comma
             row.push_back(value);
         }
 
         double dis = prof.getCurDis();
-        if (abs(dis - std::stof(row[0]) > 0.0001)) {
+        if (abs(dis - stof(row[0]) > 0.0001)) {
             return false;
         }
     }
@@ -61,29 +61,29 @@ bool testCase02() {
     double preVel = 0;
     double curVel = 0;
 
-    std::string filename = "./testCase/case2.csv";
-    std::ifstream file(filename);
+    string filename = "./testCase/case2.csv";
+    ifstream file(filename);
 
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open file " << filename << std::endl;
+        cerr << "Error: Could not open file " << filename << endl;
         return 1;
     }
 
     if (!prof.makeProf(acc,vel,tarPos - startPos)) return false;
 
-    std::string line;
-    while (std::getline(file, line) && prof.calDis(cycleTime)) { // Read the file line by line
-        std::stringstream ss(line);   // Use stringstream to parse the line
-        std::string value;
-        std::vector<std::string> row; // Store the values of the current row
+    string line;
+    while (getline(file, line) && prof.calDis(cycleTime)) { // Read the file line by line
+        stringstream ss(line);   // Use stringstream to parse the line
+        string value;
+        vector<string> row; // Store the values of the current row
 
-        while (std::getline(ss, value, ',')) { // Split by comma
+        while (getline(ss, value, ',')) { // Split by comma
             row.push_back(value);
         }
 
         double dis = prof.getCurDis();
         
-        if (abs(dis - std::stof(row[0]) > 0.0001)) {
+        if (abs(dis - stof(row[0]) > 0.0001)) {
             return false;
         }
     }
@@ -103,10 +103,10 @@ bool testCase101(void){
     MotionController mc(dof);
 
     TrapezoidalProfile* execProf1 = new TrapezoidalProfile();
-    
+
     mc.setTrapezoidalProfile(execProf1);
 
-    std::vector<double> curPose;
+    vector<double> curPose;
     curPose.push_back(1.5708f);
     curPose.push_back(-3.14159f);
     curPose.push_back(1.5708f);
@@ -116,7 +116,7 @@ bool testCase101(void){
 
     mc.setCurrentPose(curPose);
 
-    std::vector<double> targetPose;
+    vector<double> targetPose;
     targetPose.push_back(0.693782f);
     targetPose.push_back(-2.36364f);
     targetPose.push_back(2.38406f);
@@ -124,7 +124,7 @@ bool testCase101(void){
     targetPose.push_back(-1.07417f);
     targetPose.push_back(-1.14081f);
 
-    std::vector<double> targetVelsRad;
+    vector<double> targetVelsRad;
     targetVelsRad.push_back(5.23598776f);
     targetVelsRad.push_back(5.23598776f);
     targetVelsRad.push_back(6.54498469f);
@@ -132,7 +132,7 @@ bool testCase101(void){
     targetVelsRad.push_back(6.54498469f);
     targetVelsRad.push_back(10.47197551f);
 
-    std::vector<double> targetAccsRad;
+    vector<double> targetAccsRad;
     targetAccsRad.push_back(17.45329252f);
     targetAccsRad.push_back(17.45329252f);
     targetAccsRad.push_back(26.17993878f);
@@ -143,29 +143,29 @@ bool testCase101(void){
 
     double cycleTime = 0.01;
 
-    std::vector<double> cmdPose = curPose;
+    vector<double> cmdPose = curPose;
 
-    std::string filename = "./testCase/case101.csv";
-    std::ifstream file(filename);
+    string filename = "./testCase/case101.csv";
+    ifstream file(filename);
 
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open file " << filename << std::endl;
+        cerr << "Error: Could not open file " << filename << endl;
         return 1;
     }
-    std::string line;
-    while (std::getline(file, line) && mc.execCmd(cycleTime)) { // Read the file line by line
-        std::stringstream ss(line);   // Use stringstream to parse the line
-        std::string value;
-        std::vector<std::string> row; // Store the values of the current row
+    string line;
+    while (getline(file, line) && mc.execCmd(cycleTime)) { // Read the file line by line
+        stringstream ss(line);   // Use stringstream to parse the line
+        string value;
+        vector<string> row; // Store the values of the current row
 
-        while (std::getline(ss, value, ',')) { // Split by comma
+        while (getline(ss, value, ',')) { // Split by comma
             row.push_back(value);
         }
 
         cmdPose = mc.getCmdPose();
 
         for (size_t i=0;i<dof;i++) {
-            if (abs(cmdPose[i] - std::stof(row[i])) > 0.0001) return false;
+            if (abs(cmdPose[i] - stof(row[i])) > 0.0001) return false;
         }
     }
 
@@ -175,6 +175,8 @@ bool testCase101(void){
         if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
     }
 
+    delete(execProf1);
+
     return true;
 }
 
@@ -183,10 +185,10 @@ bool testCase102(void){
     int dof = 6;
     MotionController mc(dof);
 
-    TrapezoidalProfile* execPorf = new TrapezoidalProfile();
-    mc.setTrapezoidalProfile(execPorf);
+    TrapezoidalProfile* execProf = new TrapezoidalProfile();
+    mc.setTrapezoidalProfile(execProf);
 
-    std::vector<double> curPose;
+    vector<double> curPose;
     curPose.push_back(1.5708f);
     curPose.push_back(-3.14159f);
     curPose.push_back(1.5708f);
@@ -196,7 +198,7 @@ bool testCase102(void){
 
     mc.setCurrentPose(curPose);
 
-    std::vector<double> targetPose;
+    vector<double> targetPose;
     targetPose.push_back(0.693782f);
     targetPose.push_back(-2.36364f);
     targetPose.push_back(2.38406f);
@@ -204,7 +206,7 @@ bool testCase102(void){
     targetPose.push_back(-1.07417f);
     targetPose.push_back(-1.14081f);
 
-    std::vector<double> targetVelsRad;
+    vector<double> targetVelsRad;
 
     targetVelsRad.push_back(0.52359878f);
     targetVelsRad.push_back(0.52359878f);
@@ -213,7 +215,7 @@ bool testCase102(void){
     targetVelsRad.push_back(0.65449847f);
     targetVelsRad.push_back(1.04719755f);
 
-    std::vector<double> targetAccsRad;
+    vector<double> targetAccsRad;
     targetAccsRad.push_back(17.45329252f);
     targetAccsRad.push_back(17.45329252f);
     targetAccsRad.push_back(26.17993878f);
@@ -225,30 +227,30 @@ bool testCase102(void){
 
     double cycleTime = 0.01;
 
-    std::vector<double> cmdPose = curPose;
+    vector<double> cmdPose = curPose;
 
-    std::string filename = "./testCase/case102.csv";
-    std::ifstream file(filename);
+    string filename = "./testCase/case102.csv";
+    ifstream file(filename);
 
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open file " << filename << std::endl;
+        cerr << "Error: Could not open file " << filename << endl;
         return 1;
     }
 
-    std::string line;
-    while (std::getline(file, line) && mc.execCmd(cycleTime)) { // Read the file line by line
-        std::stringstream ss(line);   // Use stringstream to parse the line
-        std::string value;
-        std::vector<std::string> row; // Store the values of the current row
+    string line;
+    while (getline(file, line) && mc.execCmd(cycleTime)) { // Read the file line by line
+        stringstream ss(line);   // Use stringstream to parse the line
+        string value;
+        vector<string> row; // Store the values of the current row
 
-        while (std::getline(ss, value, ',')) { // Split by comma
+        while (getline(ss, value, ',')) { // Split by comma
             row.push_back(value);
         }
 
         cmdPose = mc.getCmdPose();
 
         for (size_t i=0;i<dof;i++) {
-            if (abs(cmdPose[i] - std::stof(row[i])) > 0.0001) {
+            if (abs(cmdPose[i] - stof(row[i])) > 0.0001) {
                 return false;
             }
         }
@@ -261,6 +263,8 @@ bool testCase102(void){
         if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
     }
 
+    delete(execProf);
+
     return true;
 }
 
@@ -268,15 +272,15 @@ bool testCase109(){
     int dof = 6;
     MotionController mc(dof);
 
-    TrapezoidalProfile* execPorf1 = new TrapezoidalProfile();
-    TrapezoidalProfile* execPorf2 = new TrapezoidalProfile();
-    TrapezoidalProfile* execPorf3 = new TrapezoidalProfile();
+    TrapezoidalProfile* execProf1 = new TrapezoidalProfile();
+    TrapezoidalProfile* execProf2 = new TrapezoidalProfile();
+    TrapezoidalProfile* execProf3 = new TrapezoidalProfile();
 
-    mc.setTrapezoidalProfile(execPorf1);
-    mc.setTrapezoidalProfile(execPorf2);
-    mc.setTrapezoidalProfile(execPorf3);
+    mc.setTrapezoidalProfile(execProf1);
+    mc.setTrapezoidalProfile(execProf2);
+    mc.setTrapezoidalProfile(execProf3);
 
-    std::vector<double> curPose;
+    vector<double> curPose;
     curPose.push_back(1.5708f);
     curPose.push_back(-3.14159f);
     curPose.push_back(1.5708f);
@@ -285,7 +289,7 @@ bool testCase109(){
     curPose.push_back(0.0f);
     mc.setCurrentPose(curPose);
 
-    std::vector<double> targetPose;
+    vector<double> targetPose;
     targetPose.push_back(0.693782f);
     targetPose.push_back(-2.36364f);
     targetPose.push_back(2.38406f);
@@ -293,7 +297,7 @@ bool testCase109(){
     targetPose.push_back(-1.07417f);
     targetPose.push_back(-1.14081f);
 
-    std::vector<double> targetVelsRad;
+    vector<double> targetVelsRad;
     targetVelsRad.push_back(5.23598776f);
     targetVelsRad.push_back(5.23598776f);
     targetVelsRad.push_back(6.54498469f);
@@ -301,7 +305,7 @@ bool testCase109(){
     targetVelsRad.push_back(6.54498469f);
     targetVelsRad.push_back(10.47197551f);
 
-    std::vector<double> targetAccsRad;
+    vector<double> targetAccsRad;
     targetAccsRad.push_back(17.45329252f);
     targetAccsRad.push_back(17.45329252f);
     targetAccsRad.push_back(26.17993878f);
@@ -327,37 +331,37 @@ bool testCase109(){
     mc.setCmd(targetPose, targetVelsRad, targetAccsRad);
 
     double cycleTime = 0.01;
-    std::vector<double> cmdPose = curPose;
-    std::string filename = "./testCase/case109.csv";
+    vector<double> cmdPose = curPose;
+    string filename = "./testCase/case109.csv";
 
-    std::ifstream file(filename);
+    ifstream file(filename);
 
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open file " << filename << std::endl;
+        cerr << "Error: Could not open file " << filename << endl;
         return 1;
     }
 
 /*
-    std::ofstream foutp;
+    ofstream foutp;
     foutp.open(filename);
 */
 
-    std::string line;
-    while (std::getline(file, line) && mc.execCmd(cycleTime)) { // Read the file line by line
-        std::stringstream ss(line);
-        std::string value;
-        std::vector<std::string> row;
+    string line;
+    while (getline(file, line) && mc.execCmd(cycleTime)) { // Read the file line by line
+        stringstream ss(line);
+        string value;
+        vector<string> row;
 
-        while (std::getline(ss, value, ',')) {
+        while (getline(ss, value, ',')) {
             row.push_back(value);
         }
 
 //    while(mc.execCmd(cycleTime)) {
-        //std::cout << "1097" << std::endl;
+        //cout << "1097" << endl;
         cmdPose = mc.getCmdPose();
 
         for (size_t i=0;i<dof;i++) {
-            if (abs(cmdPose[i] - std::stof(row[i])) > 0.0001) {
+            if (abs(cmdPose[i] - stof(row[i])) > 0.0001) {
                 return false;
             }
         }
@@ -367,8 +371,8 @@ bool testCase109(){
         for (size_t i=0;i<dof;i++) {
             foutp << cmdPose[i] << ",";
         }    
-        //std::cout << std::endl;
-        foutp << std::endl;
+        //cout << endl;
+        foutp << endl;
     }
 */       
     if (mc.execCmd(cycleTime)) return false;
@@ -378,87 +382,15 @@ bool testCase109(){
         if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
     }
 
-    return true;
+    delete(execProf1);
+    delete(execProf2);
+    delete(execProf3);
 
-}
-
-bool testCaseXXX(){
-    int dof = 6;
-    MotionController mc(dof);
-
-    std::vector<double> curPose;
-    curPose.push_back(1.5708f);
-    curPose.push_back(-3.14159f);
-    curPose.push_back(1.5708f);
-    curPose.push_back(0.0f);
-    curPose.push_back(0.0f);
-    curPose.push_back(0.0f);
-
-    mc.setCurrentPose(curPose);
-
-    std::vector<double> targetPose;
-    targetPose.push_back(1.68019f);
-    targetPose.push_back(-2.35679f);
-    targetPose.push_back(2.45324f);
-    targetPose.push_back(2.56348f);
-    targetPose.push_back(-0.904948f);
-    targetPose.push_back(3.63343f);
-
-    std::vector<double> targetVelsRad;
-    targetVelsRad.push_back(5.23598776f);
-    targetVelsRad.push_back(5.23598776f);
-    targetVelsRad.push_back(6.54498469f);
-    targetVelsRad.push_back(6.54498469f);
-    targetVelsRad.push_back(6.54498469f);
-    targetVelsRad.push_back(10.47197551f);
-
-    std::vector<double> targetAccsRad;
-    targetAccsRad.push_back(17.45329252f);
-    targetAccsRad.push_back(17.45329252f);
-    targetAccsRad.push_back(26.17993878f);
-    targetAccsRad.push_back(26.17993878f);
-    targetAccsRad.push_back(26.17993878f);
-    targetAccsRad.push_back(34.90658504f);
-
-    mc.setCmd(targetPose, targetVelsRad, targetAccsRad);
-
-    targetPose[0] = 0.0;
-    targetPose[1] = 0.0;
-    targetPose[2] = 1.5708;
-    targetPose[3] = 0.0;
-    targetPose[4] = 0.0;
-    targetPose[5] = 0.0;
-    mc.setCmd(targetPose, targetVelsRad, targetAccsRad);
-
-    double cycleTime = 0.1;
-
-    std::vector<double> cmdPose = curPose;
-
-    for (size_t i=0;i<dof;i++) {
-        std::cout << "vertex[" << i << "] = " << curPose[i] << ';' << std::endl;
-    }   
-    std::cout << std::endl;
-
-    while (mc.execCmd(cycleTime)) { 
-        cmdPose = mc.getCmdPose();
-        for (size_t i=0;i<dof;i++) {
-            std::cout << "vertex[" << i << "] = " << cmdPose[i] << ';' << std::endl;
-        }   
-        std::cout << std::endl;
-    }
-
-    if (mc.execCmd(cycleTime)) return false;
-
-    cmdPose = mc.getCmdPose();
-
-    for (size_t i=0;i<dof;i++) {
-        std::cout << "vertex[" << i << "] = " << cmdPose[i] << ';' << std::endl;
-    }   
-    std::cout << std::endl;
 
     return true;
 
 }
+
 
 bool testCase_201(){
 
@@ -473,21 +405,21 @@ bool testCase_201(){
     double preVel = 0.0;
     double curAcc = 0.0;
 
-    std::string filename = "./testCase/case201.csv";
-    std::ifstream file(filename);
+    string filename = "./testCase/case201.csv";
+    ifstream file(filename);
 
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open file " << filename << std::endl;
+        cerr << "Error: Could not open file " << filename << endl;
         return 1;
     }
 
-    std::string line;
-    while (std::getline(file, line) && sc.calDis(cycleTime)) { // Read the file line by line
-        std::stringstream ss(line);
-        std::string value;
-        std::vector<std::string> row;
+    string line;
+    while (getline(file, line) && sc.calDis(cycleTime)) { // Read the file line by line
+        stringstream ss(line);
+        string value;
+        vector<string> row;
 
-        while (std::getline(ss, value, ',')) {
+        while (getline(ss, value, ',')) {
             row.push_back(value);
         }
 
@@ -495,13 +427,13 @@ bool testCase_201(){
         curVel = (curPos - prePos) / cycleTime;
         curAcc = (curVel - preVel) / cycleTime;
 
-        if (abs(curPos - std::stof(row[0])) > 0.0001) {
+        if (abs(curPos - stof(row[0])) > 0.0001) {
                 return false;
         }
-        if (abs(curVel - std::stof(row[1])) > 0.0001) {
+        if (abs(curVel - stof(row[1])) > 0.0001) {
                 return false;
         }
-        if (abs(curAcc - std::stof(row[2])) > 0.0001) {
+        if (abs(curAcc - stof(row[2])) > 0.0001) {
                 return false;
         }
 
@@ -526,21 +458,21 @@ bool testCase_202(){
     double preVel = 0.0;
     double curAcc = 0.0;
 
-    std::string filename = "./testCase/case202.csv";
-    std::ifstream file(filename);
+    string filename = "./testCase/case202.csv";
+    ifstream file(filename);
 
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open file " << filename << std::endl;
+        cerr << "Error: Could not open file " << filename << endl;
         return 1;
     }
 
-    std::string line;
-    while (std::getline(file, line) && sc.calDis(cycleTime)) { // Read the file line by line
-        std::stringstream ss(line);
-        std::string value;
-        std::vector<std::string> row;
+    string line;
+    while (getline(file, line) && sc.calDis(cycleTime)) { // Read the file line by line
+        stringstream ss(line);
+        string value;
+        vector<string> row;
 
-        while (std::getline(ss, value, ',')) {
+        while (getline(ss, value, ',')) {
             row.push_back(value);
         }
 
@@ -548,13 +480,13 @@ bool testCase_202(){
         curVel = (curPos - prePos) / cycleTime;
         curAcc = (curVel - preVel) / cycleTime;
 
-        if (abs(curPos - std::stof(row[0])) > 0.0001) {
+        if (abs(curPos - stof(row[0])) > 0.0001) {
                 return false;
         }
-        if (abs(curVel - std::stof(row[1])) > 0.0001) {
+        if (abs(curVel - stof(row[1])) > 0.0001) {
                 return false;
         }
-        if (abs(curAcc - std::stof(row[2])) > 0.0001) {
+        if (abs(curAcc - stof(row[2])) > 0.0001) {
                 return false;
         }
 
@@ -579,21 +511,21 @@ bool testCase_203(){
     double preVel = 0.0;
     double curAcc = 0.0;
 
-    std::string filename = "./testCase/case203.csv";
-    std::ifstream file(filename);
+    string filename = "./testCase/case203.csv";
+    ifstream file(filename);
 
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open file " << filename << std::endl;
+        cerr << "Error: Could not open file " << filename << endl;
         return 1;
     }
 
-    std::string line;
-    while (std::getline(file, line) && sc.calDis(cycleTime)) { // Read the file line by line
-        std::stringstream ss(line);
-        std::string value;
-        std::vector<std::string> row;
+    string line;
+    while (getline(file, line) && sc.calDis(cycleTime)) { // Read the file line by line
+        stringstream ss(line);
+        string value;
+        vector<string> row;
 
-        while (std::getline(ss, value, ',')) {
+        while (getline(ss, value, ',')) {
             row.push_back(value);
         }
 
@@ -601,13 +533,13 @@ bool testCase_203(){
         curVel = (curPos - prePos) / cycleTime;
         curAcc = (curVel - preVel) / cycleTime;
 
-        if (abs(curPos - std::stof(row[0])) > 0.0001) {
+        if (abs(curPos - stof(row[0])) > 0.0001) {
                 return false;
         }
-        if (abs(curVel - std::stof(row[1])) > 0.0001) {
+        if (abs(curVel - stof(row[1])) > 0.0001) {
                 return false;
         }
-        if (abs(curAcc - std::stof(row[2])) > 0.0001) {
+        if (abs(curAcc - stof(row[2])) > 0.0001) {
                 return false;
         }
 
@@ -624,12 +556,12 @@ bool testCase301(void){
     int dof = 6;
     MotionController mc(dof);
 
-    ScurveProfile* execPorf1 = new ScurveProfile();
-    mc.setScurveProfile(execPorf1);
-    ScurveProfile* execPorf2 = new ScurveProfile();
-    mc.setScurveProfile(execPorf2);
+    ScurveProfile* execProf1 = new ScurveProfile();
+    mc.setScurveProfile(execProf1);
+    ScurveProfile* execProf2 = new ScurveProfile();
+    mc.setScurveProfile(execProf2);
 
-    std::vector<double> curPose;
+    vector<double> curPose;
     curPose.push_back(1.5708f);
     curPose.push_back(-3.14159f);
     curPose.push_back(1.5708f);
@@ -639,7 +571,7 @@ bool testCase301(void){
 
     mc.setCurrentPose(curPose);
 
-    std::vector<double> targetPose;
+    vector<double> targetPose;
 
     targetPose.push_back(0.0f);
     targetPose.push_back(0.0f);
@@ -648,7 +580,7 @@ bool testCase301(void){
     targetPose.push_back(0.0f);
     targetPose.push_back(0.0f);
 
-    std::vector<double> targetVelsRad;
+    vector<double> targetVelsRad;
     targetVelsRad.push_back(5.23598776f);
     targetVelsRad.push_back(5.23598776f);
     targetVelsRad.push_back(6.54498469f);
@@ -656,7 +588,7 @@ bool testCase301(void){
     targetVelsRad.push_back(6.54498469f);
     targetVelsRad.push_back(10.47197551f);
 
-    std::vector<double> targetAccsRad;
+    vector<double> targetAccsRad;
     targetAccsRad.push_back(17.45329252f);
     targetAccsRad.push_back(17.45329252f);
     targetAccsRad.push_back(26.17993878f);
@@ -677,9 +609,9 @@ bool testCase301(void){
 
     double cycleTime = 0.01;
 
-    std::vector<double> cmdPose = curPose;
-    std::vector<double> prePose = curPose;
-    std::vector<double> cmdVels;
+    vector<double> cmdPose = curPose;
+    vector<double> prePose = curPose;
+    vector<double> cmdVels;
     cmdVels.push_back(0.0f);
     cmdVels.push_back(0.0f);
     cmdVels.push_back(0.0f);
@@ -687,52 +619,52 @@ bool testCase301(void){
     cmdVels.push_back(0.0f);
     cmdVels.push_back(0.0f);
 
-    std::vector<double> preVels = cmdVels;
-    std::vector<double> cmdAccs = cmdVels;
+    vector<double> preVels = cmdVels;
+    vector<double> cmdAccs = cmdVels;
 
-    std::string filenamep = "./testCase/case301_pose.csv";
-    //std::string filenamev = "./testCase/case301_vels.csv";
-    //std::string filenamea = "./testCase/case301_accs.csv";
+    string filenamep = "./testCase/case301_pose.csv";
+    //string filenamev = "./testCase/case301_vels.csv";
+    //string filenamea = "./testCase/case301_accs.csv";
 
-    std::ifstream filep(filenamep);
-    //std::ifstream filev(filenamev);
-    //std::ifstream filea(filenamea);
+    ifstream filep(filenamep);
+    //ifstream filev(filenamev);
+    //ifstream filea(filenamea);
 
     if (!filep.is_open()) {
-        std::cerr << "Error: Could not open file " << std::endl;
+        cerr << "Error: Could not open file " << endl;
         return false;
     }
 
 /*
-    std::ofstream foutp;
-    std::ofstream foutv;
-    std::ofstream fouta;
+    ofstream foutp;
+    ofstream foutv;
+    ofstream fouta;
 
     foutp.open(filenamep);
     foutv.open(filenamev);
     fouta.open(filenamea);
 */
-    std::string line;
-    while (std::getline(filep, line) && mc.execCmd(cycleTime)) { // Read the file line by line
-        std::stringstream ss(line);
-        std::string value;
-        std::vector<std::string> row;
+    string line;
+    while (getline(filep, line) && mc.execCmd(cycleTime)) { // Read the file line by line
+        stringstream ss(line);
+        string value;
+        vector<string> row;
 
-        while (std::getline(ss, value, ',')) {
+        while (getline(ss, value, ',')) {
             row.push_back(value);
         }
 
         cmdPose = mc.getCmdPose();
 
         for (size_t i=0;i<dof;i++) {
-            if (abs(cmdPose[i] - std::stof(row[i])) > 0.0001) return false;
+            if (abs(cmdPose[i] - stof(row[i])) > 0.0001) return false;
         }
 
         for (size_t i=0;i<dof;i++) {
             cmdVels[i] = (cmdPose[i] - prePose[i]) / cycleTime;
             cmdAccs[i] = (cmdVels[i] - preVels[i]) / cycleTime;
 
-            //std::cout << cmdPose[i] << ",";
+            //cout << cmdPose[i] << ",";
             //foutp << cmdPose[i] << ",";
             //foutv << cmdVels[i] << ",";
             //fouta << cmdAccs[i] << ",";
@@ -740,10 +672,10 @@ bool testCase301(void){
             prePose[i] = cmdPose[i];
             preVels[i] = cmdVels[i];
         }
-        //std::cout << std::endl;
-        //foutp << std::endl;
-        //foutv << std::endl;
-        //fouta << std::endl;
+        //cout << endl;
+        //foutp << endl;
+        //foutv << endl;
+        //fouta << endl;
 
     }
 
@@ -753,6 +685,98 @@ bool testCase301(void){
         if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
     }
 
+    delete(execProf1);
+    delete(execProf2);
+
     return true;
 }
 
+bool testCaseXXX(){
+    int dof = 6;
+    MotionController mc(dof);
+
+    ScurveProfile* execProf1 = new ScurveProfile();
+    mc.setScurveProfile(execProf1);
+    ScurveProfile* execProf2 = new ScurveProfile();
+    mc.setScurveProfile(execProf2);
+    ScurveProfile* execProf3 = new ScurveProfile();
+    mc.setScurveProfile(execProf3);
+
+
+    vector<double> curPose;
+    curPose.push_back(1.5708f);
+    curPose.push_back(-3.14159f);
+    curPose.push_back(1.5708f);
+    curPose.push_back(0.0f);
+    curPose.push_back(0.0f);
+    curPose.push_back(0.0f);
+
+    mc.setCurrentPose(curPose);
+
+    vector<double> targetPose;
+    targetPose.push_back(1.68019f);
+    targetPose.push_back(-2.35679f);
+    targetPose.push_back(2.45324f);
+    targetPose.push_back(2.56348f);
+    targetPose.push_back(-0.904948f);
+    targetPose.push_back(3.63343f);
+
+    vector<double> targetVelsRad;
+    targetVelsRad.push_back(5.23598776f);
+    targetVelsRad.push_back(5.23598776f);
+    targetVelsRad.push_back(6.54498469f);
+    targetVelsRad.push_back(6.54498469f);
+    targetVelsRad.push_back(6.54498469f);
+    targetVelsRad.push_back(10.47197551f);
+
+    vector<double> targetAccsRad;
+    targetAccsRad.push_back(17.45329252f);
+    targetAccsRad.push_back(17.45329252f);
+    targetAccsRad.push_back(26.17993878f);
+    targetAccsRad.push_back(26.17993878f);
+    targetAccsRad.push_back(26.17993878f);
+    targetAccsRad.push_back(34.90658504f);
+
+    mc.setCmd(targetPose, targetVelsRad, targetAccsRad);
+
+    targetPose[0] = 0.0;
+    targetPose[1] = 0.0;
+    targetPose[2] = 1.5708;
+    targetPose[3] = 0.0;
+    targetPose[4] = 0.0;
+    targetPose[5] = 0.0;
+    mc.setCmd(targetPose, targetVelsRad, targetAccsRad);
+
+    double cycleTime = 0.1;
+
+    vector<double> cmdPose = curPose;
+
+    for (size_t i=0;i<dof;i++) {
+        cout << "vertex[" << i << "] = " << curPose[i] << ';' << endl;
+    }   
+    cout << endl;
+     
+    while (mc.execCmd(cycleTime)) { 
+        cmdPose = mc.getCmdPose();
+        for (size_t i=0;i<dof;i++) {
+            cout << "vertex[" << i << "] = " << cmdPose[i] << ';' << endl;
+        }   
+        cout << endl;
+    }
+
+    if (mc.execCmd(cycleTime)) return false;
+
+    cmdPose = mc.getCmdPose();
+
+    for (size_t i=0;i<dof;i++) {
+        cout << "vertex[" << i << "] = " << cmdPose[i] << ';' << endl;
+    }   
+    cout << endl;
+
+    delete(execProf1);
+    delete(execProf2);
+    delete(execProf3);
+
+    return true;
+
+}
