@@ -139,10 +139,15 @@ bool ScurveProfile::makeProf(double acc, double vel, double dis) {
     this->decTime = this->diffTime[4] + this->diffTime[5] + this->diffTime[6];
     this->totalTime = this->accTime + this->diffTime[3] + this->decTime;
 
+    this->isCreated = true;
+
     return true;
 }
 
 bool ScurveProfile::calDis(double cycleTime) {
+
+    if (!this->isCreated)
+        return false;
 
     this->curSecTime += cycleTime;
     this->elapsedTime = this->curSecTime;
