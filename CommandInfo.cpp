@@ -6,16 +6,17 @@ CommandInfo::CommandInfo() :
     targetPose(dof, 0.0f),
     targetVels(dof, 0.0f),
     targetAccs(dof, 0.0f),
+    targetJerks(dof, 0.0f),
     startPose(dof, 0.0f)
 {
-    // initialization
 }
 
-void CommandInfo::setParam(vector<double> targetPose, vector<double> targetVels, vector<double> targetAccs)
+void CommandInfo::setVelocityProfParam(vector<double> targetPose, vector<double> targetVels, vector<double> targetAccs, vector<double> targetJerks)
 {
     this->targetPose = targetPose;
     this->targetVels = targetVels;
     this->targetAccs = targetAccs;
+    this->targetJerks = targetJerks;
 }
 
 void CommandInfo::setStartPose(vector<double> startPose)
@@ -41,6 +42,11 @@ vector<double> CommandInfo::getTargetVels(void)
 vector<double> CommandInfo::getTargetAccs(void) 
 {
     return this->targetAccs;    
+}
+
+vector<double> CommandInfo::getTargetJerks(void) 
+{
+    return this->targetJerks;    
 }
 
 vector<double> CommandInfo::getStartPose(void) 

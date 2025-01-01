@@ -33,9 +33,9 @@ bool ScurveProfile::isDecelerating(void) {
     return false;
 }
 
-bool ScurveProfile::makeProf(double acc, double vel, double dis) {
+bool ScurveProfile::makeVelProf(double dis, double vel, double acc, double jerk) {
 
-    this->jerk = 1;
+    this->jerk = jerk;
     this->accDec = acc; 
     this->targetVel = vel;
     this->distance = dis;

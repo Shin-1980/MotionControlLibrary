@@ -13,7 +13,7 @@ public:
     double getCurDis(void);
     bool isDone(void);
     bool isDecelerating(void);
-    bool makeProf(double acc, double vel, double dis);
+    bool makeVelProf(double dis, double vel, double acc, double jerk);
     bool calDis(double cycleTime);
 
 private:

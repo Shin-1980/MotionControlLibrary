@@ -38,7 +38,7 @@ bool TrapezoidalProfile::isDecelerating(void)
         return false;
 }
 
-bool TrapezoidalProfile::makeProf(double acc, double vel, double dis) 
+bool TrapezoidalProfile::makeVelProf(double dis, double vel, double acc, double jerk) 
 {
     if (acc <= 0 || vel <= 0 || dis <= 0)
         return false;

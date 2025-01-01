@@ -17,7 +17,7 @@ public:
     void setScurveProfile(shared_ptr<ScurveProfile> prof);
     void setTrapezoidalProfile(shared_ptr<TrapezoidalProfile> prof);
     void setCurrentPose(vector<double> curPose);
-    void setCmd(vector<double> targetPose, vector<double> targetVels, vector<double> targetAccs);
+    void setVelocityProfParam(vector<double> targetPose, vector<double> targetVels, vector<double> targetAccs, vector<double> targetJerks);
     vector<double> getCmdPose(void);
     vector<double> getCmdVels(void);
     vector<double> getCmdAccs(void);

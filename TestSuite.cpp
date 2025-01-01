@@ -21,7 +21,7 @@ bool testCase01() {
         return false;
     }
 
-    if (!prof.makeProf(acc,vel,tarPos - startPos)) return false;
+    if (!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0)) return false;
 
     string line;
     while (getline(file, line) && prof.calDis(cycleTime)) { // Read the file line by line
@@ -69,7 +69,7 @@ bool testCase02() {
         return 1;
     }
 
-    if (!prof.makeProf(acc,vel,tarPos - startPos)) return false;
+    if (!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0)) return false;
 
     string line;
     while (getline(file, line) && prof.calDis(cycleTime)) { // Read the file line by line
@@ -139,7 +139,10 @@ bool testCase101(void){
     targetAccsRad.push_back(26.17993878f);
     targetAccsRad.push_back(26.17993878f);
     targetAccsRad.push_back(34.90658504f);
-    mc.setCmd(targetPose, targetVelsRad, targetAccsRad);
+
+    vector<double> targetJerks;
+    targetJerks.push_back(0.0f);
+    mc.setVelocityProfParam(targetPose, targetVelsRad, targetAccsRad, targetJerks);
 
     double cycleTime = 0.01;
 
@@ -223,7 +226,9 @@ bool testCase102(void){
     targetAccsRad.push_back(26.17993878f);
     targetAccsRad.push_back(34.90658504f);
 
-    mc.setCmd(targetPose, targetVelsRad, targetAccsRad);
+    vector<double> targetJerks;
+    targetJerks.push_back(0.0f);
+    mc.setVelocityProfParam(targetPose, targetVelsRad, targetAccsRad, targetJerks);
 
     double cycleTime = 0.01;
 
@@ -312,7 +317,10 @@ bool testCase109(){
     targetAccsRad.push_back(26.17993878f);
     targetAccsRad.push_back(26.17993878f);
     targetAccsRad.push_back(34.90658504f);
-    mc.setCmd(targetPose, targetVelsRad, targetAccsRad);
+        
+    vector<double> targetJerks;
+    targetJerks.push_back(0.0f);
+    mc.setVelocityProfParam(targetPose, targetVelsRad, targetAccsRad, targetJerks);
 
     targetPose[0] = 0.456344;
     targetPose[1] = -2.54862;
@@ -320,7 +328,7 @@ bool testCase109(){
     targetPose[3] = 1.78586;
     targetPose[4] = -0.350709;
     targetPose[5] = -1.29741;
-    mc.setCmd(targetPose, targetVelsRad, targetAccsRad);
+    mc.setVelocityProfParam(targetPose, targetVelsRad, targetAccsRad, targetJerks);
 
     targetPose[0] = -0.449;
     targetPose[1] = -0.890494;
@@ -328,7 +336,7 @@ bool testCase109(){
     targetPose[3] = 2.06081;
     targetPose[4] = -0.0605401;
     targetPose[5] = -0.624552;
-    mc.setCmd(targetPose, targetVelsRad, targetAccsRad);
+    mc.setVelocityProfParam(targetPose, targetVelsRad, targetAccsRad, targetJerks);
 
     double cycleTime = 0.01;
     vector<double> cmdPose = curPose;
@@ -395,7 +403,7 @@ bool testCase_201(){
 
     ScurveProfile sc;
     // acc, dec, vel, pos
-    if (!sc.makeProf(1, 5, 100)) return false;
+    if (!sc.makeVelProf(100,5,1,0.0)) return false;
 
     double cycleTime = 0.2;
     double curPos = 0.0;
@@ -448,7 +456,7 @@ bool testCase_202(){
 
     ScurveProfile sc;
     // acc, dec, vel, pos
-    if(!sc.makeProf(1, 5, 0.25)) return false;
+    if(!sc.makeVelProf(0.25, 5, 1, 0.0)) return false;
 
     double cycleTime = 0.2;
     double curPos = 0.0;
@@ -501,7 +509,7 @@ bool testCase_203(){
 
     ScurveProfile sc;
     // acc, dec, vel, pos
-    if (!sc.makeProf(1, 100, 10)) return false;
+    if (!sc.makeVelProf(10, 100, 1, 0.0)) return false;
 
     double cycleTime = 0.2;
     double curPos = 0.0;
@@ -596,7 +604,14 @@ bool testCase301(void){
     targetAccsRad.push_back(26.17993878f);
     targetAccsRad.push_back(34.90658504f);
 
-    mc.setCmd(targetPose, targetVelsRad, targetAccsRad);
+    vector<double> targetJerksRad;
+    targetJerksRad.push_back(1.0f);
+    targetJerksRad.push_back(1.0f);
+    targetJerksRad.push_back(1.0f);
+    targetJerksRad.push_back(1.0f);
+    targetJerksRad.push_back(1.0f);
+    targetJerksRad.push_back(1.0f);
+    mc.setVelocityProfParam(targetPose, targetVelsRad, targetAccsRad, targetJerksRad);
 
     targetPose[0] = 0.0;
     targetPose[1] = 0.0;
@@ -604,8 +619,7 @@ bool testCase301(void){
     targetPose[3] = 0.0;
     targetPose[4] = 0.0;
     targetPose[5] = 0.0;
-    
-    mc.setCmd(targetPose, targetVelsRad, targetAccsRad);
+    mc.setVelocityProfParam(targetPose, targetVelsRad, targetAccsRad, targetJerksRad);
 
     double cycleTime = 0.01;
 

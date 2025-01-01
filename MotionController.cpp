@@ -30,7 +30,7 @@ void MotionController::setCurrentPose(vector<double> curPose)
     this->prePose = curPose;
 }
 
-void MotionController::setCmd(vector<double> targetPose, vector<double> targetVels, vector<double> targetAccs)
+void MotionController::setVelocityProfParam(vector<double> targetPose, vector<double> targetVels, vector<double> targetAccs, vector<double> targetJerks)
 {
     CommandInfo cmd;
     this->cmdContainer.push_back(cmd);
@@ -39,9 +39,10 @@ void MotionController::setCmd(vector<double> targetPose, vector<double> targetVe
         //cout << "The number of profiler exceeds the limit" << endl;
     }
 
-    this->cmdContainer[this->storedProfNum].setParam(targetPose, targetVels, targetAccs);
+    this->cmdContainer[this->storedProfNum].setVelocityProfParam(targetPose, targetVels, targetAccs, targetJerks);
     this->storedProfNum++;
 }
+
 
 vector<double> MotionController::getCmdPose(void){
     return this->curPose;
@@ -79,6 +80,7 @@ bool MotionController::makeLinearProf(shared_ptr<TrajectoryProfile> prof, Comman
     vector<double> accs = cmdInfo->getTargetAccs();
     vector<double> vels = cmdInfo->getTargetVels();
     vector<double> diss = cmdInfo->getUnsignedTotalDistance();
+    vector<double> jerks = cmdInfo->getTargetJerks();
 
     for (size_t i=0;i<this->dof;i++){
         if (accs[i] < 0 || vels[i] < 0)
@@ -88,8 +90,9 @@ bool MotionController::makeLinearProf(shared_ptr<TrajectoryProfile> prof, Comman
     double acc = accs[cmdInfo->getBaseCoordinate()];
     double vel = vels[cmdInfo->getBaseCoordinate()];
     double dis = diss[cmdInfo->getBaseCoordinate()];
+    double jerk = jerks[cmdInfo->getBaseCoordinate()];
 
-    return prof->makeProf(acc, vel, dis);
+    return prof->makeVelProf(dis, vel, acc, jerk);
 }
 
 bool MotionController::isEnableToExecImposedProf() {
