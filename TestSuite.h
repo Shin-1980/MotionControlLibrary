@@ -38,5 +38,6 @@ bool testCase_ScurveProfile_007();
 bool testCase_ScurveProfile_008();
 
 bool testCase_ScurveProfile_101();
+bool testCase_ScurveProfile_102();
 
 #endif // TESTSUITE_H

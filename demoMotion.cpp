@@ -87,4 +87,8 @@ int main(){
     if (testCase_ScurveProfile_101()) cout << "PATH:" << count << endl;
     else cout << "NG:" << count << endl;
 
+    count++;
+    if (testCase_ScurveProfile_102()) cout << "PATH:" << count << endl;
+    else cout << "NG:" << count << endl;
+
 }

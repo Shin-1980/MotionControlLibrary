@@ -36,6 +36,7 @@ private:
     double curDis;
 
     void fillAllProfile(); 
+    void makeProfileInAccDecPhase();
 
 };
 

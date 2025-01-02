@@ -872,3 +872,154 @@ bool testCase_ScurveProfile_101(void){
 
     return true;
 }
+
+
+bool testCase_ScurveProfile_102(void){
+        
+    int dof = 6;
+    MotionController mc(dof);
+
+    shared_ptr<ScurveProfile> execProf1 = make_shared<ScurveProfile>();
+    shared_ptr<ScurveProfile> execProf2 = make_shared<ScurveProfile>();
+
+    mc.setScurveProfile(execProf1);
+    mc.setScurveProfile(execProf2);
+
+    vector<double> curPose;
+    curPose.push_back(1.5708f);
+    curPose.push_back(-3.14159f);
+    curPose.push_back(1.5708f);
+    curPose.push_back(0.0f);
+    curPose.push_back(0.0f);
+    curPose.push_back(0.0f);
+
+    mc.setCurrentPose(curPose);
+
+    vector<double> targetPose;
+
+    targetPose.push_back(0.0f);
+    targetPose.push_back(0.0f);
+    targetPose.push_back(1.5708f);
+    targetPose.push_back(0.0f);
+    targetPose.push_back(0.0f);
+    targetPose.push_back(0.0f);
+
+    vector<double> targetVelsRad;
+    targetVelsRad.push_back(5.23598776f);
+    targetVelsRad.push_back(5.23598776f);
+    targetVelsRad.push_back(6.54498469f);
+    targetVelsRad.push_back(6.54498469f);
+    targetVelsRad.push_back(6.54498469f);
+    targetVelsRad.push_back(10.47197551f);
+
+    vector<double> targetAccsRad;
+    targetAccsRad.push_back(17.45329252f);
+    targetAccsRad.push_back(17.45329252f);
+    targetAccsRad.push_back(26.17993878f);
+    targetAccsRad.push_back(26.17993878f);
+    targetAccsRad.push_back(26.17993878f);
+    targetAccsRad.push_back(34.90658504f);
+
+    vector<double> targetJerksRad;
+    targetJerksRad.push_back(50.0f);
+    targetJerksRad.push_back(50.0f);
+
+    targetJerksRad.push_back(50.0f);
+    targetJerksRad.push_back(50.0f);
+    targetJerksRad.push_back(50.0f);
+    targetJerksRad.push_back(50.0f);
+    mc.setVelocityProfParam(targetPose, targetVelsRad, targetAccsRad, targetJerksRad);
+
+    targetPose[0] = 0.0;
+    targetPose[1] = 0.0;
+    targetPose[2] = 0.0;
+    targetPose[3] = 0.0;
+    targetPose[4] = 0.0;
+    targetPose[5] = 0.0;
+    mc.setVelocityProfParam(targetPose, targetVelsRad, targetAccsRad, targetJerksRad);
+
+    double cycleTime = 0.01;
+
+    vector<double> cmdPose = curPose;
+    vector<double> prePose = curPose;
+    vector<double> cmdVels;
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+
+    vector<double> preVels = cmdVels;
+    vector<double> cmdAccs = cmdVels;
+
+    string filenamep = "./testCase/case_Scurve102_pose.csv";
+    //string filenamev = "./testCase/case_Scurve102_vels.csv";
+    //string filenamea = "./testCase/case_Scurve102_accs.csv";
+
+    ifstream filep(filenamep);
+    //ifstream filev(filenamev);
+    //ifstream filea(filenamea);
+
+    if (!filep.is_open()) {
+        cerr << "Error: Could not open file " << endl;
+        return false;
+    }
+
+/*
+    ofstream foutp;
+    ofstream foutv;
+    ofstream fouta;
+
+    foutp.open(filenamep);
+    foutv.open(filenamev);
+    fouta.open(filenamea);
+*/
+    string line;
+    while (getline(filep, line) && mc.execCmd(cycleTime)) { // Read the file line by line
+        stringstream ss(line);
+        string value;
+        vector<string> row;
+
+        while (getline(ss, value, ',')) {
+            row.push_back(value);
+        }
+
+        cmdPose = mc.getCmdPose();
+
+        for (size_t i=0;i<dof;i++) {
+            if (abs(cmdPose[i] - stof(row[i])) > 0.0001) return false;
+        }
+        
+        for (size_t i=0;i<dof;i++) {
+            cmdVels[i] = (cmdPose[i] - prePose[i]) / cycleTime;
+            cmdAccs[i] = (cmdVels[i] - preVels[i]) / cycleTime;
+
+            //cout << cmdPose[i] << ",";
+            //foutp << cmdPose[i] << ",";
+            //foutv << cmdVels[i] << ",";
+            //fouta << cmdAccs[i] << ",";
+
+            prePose[i] = cmdPose[i];
+            preVels[i] = cmdVels[i];
+        }
+        //cout << endl;
+        //foutp << endl;
+        //foutv << endl;
+        //fouta << endl;
+    }
+
+    cmdPose = mc.getCmdPose();
+
+    for (size_t i=0;i<dof;i++) {
+        if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
+        //cout << cmdPose[i] << ",";
+    }
+    //cout << endl;
+
+    execProf1.reset();
+    execProf2.reset();
+
+    return true;
+}
+

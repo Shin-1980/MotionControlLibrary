@@ -51,39 +51,7 @@ bool ScurveProfile::makeVelProf(double dis, double vel, double acc, double jerk)
     this->diffTime[2] = this->diffTime[0];
     this->diffVel[2] = this->diffVel[0];
 
-    if (this->targetVel < fabs(this->diffVel[0] + this->diffVel[2] ))
-    {
-        this->diffTime[1] = 0.;
-        this->diffVel[1] = 0.;
-        this->diffPos[1] = 0.;
-        this->accDec = sqrt(this->targetVel * this->jerk);
-        
-        this->diffTime[0] = fabs(this->accDec / this->jerk);
-        this->diffVel[0] = this->accDec * (this->diffTime[0]) * 0.5;
-        this->diffTime[2] = this->diffTime[0];
-        this->diffVel[2] = this->diffVel[0];
-
-        this->initVel[0] = 0.0;
-        this->diffVel[0] = this->jerk * this->diffTime[0] * this->diffTime[0] * 0.5;
-        this->initVel[1] = this->diffVel[0];
-        this->initVel[2] = this->initVel[1];
-        this->diffVel[2] = this->diffVel[0];
-        this->diffPos[0] = this->jerk * this->diffTime[0] * this->diffTime[0] * this->diffTime[0] / 6.0;
-        this->diffPos[2] = this->targetVel * this->diffTime[2] - this->jerk * this->diffTime[0] * this->diffTime[0] * this->diffTime[0] / 6.0;
-    }
-    else
-    {
-        this->diffVel[1] = this->targetVel - (this->diffVel[0] + this->diffVel[2]);
-        this->diffTime[1] = fabs(this->diffVel[1] / this->accDec);
-        this->initVel[0] = 0.0;
-        this->initVel[1] = this->diffVel[0];
-        this->initVel[2] = this->initVel[1] + this->diffVel[1];
-        this->diffVel[2] = this->diffVel[0];
-        this->jerk * this->diffTime[0] * this->diffTime[0] * this->diffTime[0] / 6.0;
-        this->diffPos[1] = (this->initVel[1] + this->initVel[2]) * this->diffTime[1] * 0.5;        
-        this->diffPos[0] = this->jerk * this->diffTime[0] * this->diffTime[0] * this->diffTime[0] / 6.0;
-        this->diffPos[2]  = targetVel  * this->diffTime[2] - this->diffPos[0];
-    }
+    this->makeProfileInAccDecPhase();
 
     this->initVel[0] = 0.0;
     this->initVel[1] = this->diffVel[0];
@@ -95,6 +63,8 @@ bool ScurveProfile::makeVelProf(double dis, double vel, double acc, double jerk)
                         + this->diffPos[2] + this->diffPos[4] 
                         + this->diffPos[5] + this->diffPos[6]) 
     {
+        // reset acc with the input paramater
+        this->accDec = acc;
         if(this->distance < 0.5 * this->accDec * this->accDec / this->jerk * this->accDec / this->jerk) {
             // correct both acceleration and target velotity
             this->accDec = cbrt(0.5 * this->distance * this->jerk * this->jerk); 
@@ -106,21 +76,7 @@ bool ScurveProfile::makeVelProf(double dis, double vel, double acc, double jerk)
                             + this->accDec / (this->jerk) * (-1.)) * this->accDec * (0.5);
         }
 
-        this->diffTime[0] = this->accDec / this->jerk;
-        this->diffVel[0] = this->accDec * (this->diffTime[0]) * 0.5;
-        this->diffTime[2] = this->diffTime[0];
-        this->diffVel[2] = this->diffVel[0];
-
-        this->diffVel[1] = this->targetVel - (this->diffVel[0] + this->diffVel[2]);
-        this->diffTime[1] = fabs(this->diffVel[1] / this->accDec);
-        this->initVel[0] = 0.0;
-        this->initVel[1] = 0.0 + this->diffVel[0];
-        this->initVel[2] = this->initVel[1] + this->diffVel[1];
-        this->diffVel[2] = this->diffVel[0];
-
-        this->diffPos[1] = (this->initVel[1] + this->initVel[2]) * this->diffTime[1] * 0.5;        
-        this->diffPos[0] = 0.0 + this->jerk * this->diffTime[0] * this->diffTime[0] * this->diffTime[0] / 6.0;
-        this->diffPos[2] = targetVel  * this->diffTime[2] - this->diffPos[0];
+        this->makeProfileInAccDecPhase();
 
         this->fillAllProfile();
     }
@@ -238,4 +194,41 @@ void ScurveProfile::fillAllProfile(){
     this->initVel[6] = this->initVel[5] + this->diffVel[6];
 }
 
+void ScurveProfile::makeProfileInAccDecPhase(){
+
+    if (this->targetVel < fabs(this->diffVel[0] + this->diffVel[2] ))
+    {
+        this->diffTime[1] = 0.;
+        this->diffVel[1] = 0.;
+        this->diffPos[1] = 0.;
+        this->accDec = sqrt(this->targetVel * this->jerk);
+        
+        this->diffTime[0] = fabs(this->accDec / this->jerk);
+        this->diffVel[0] = this->accDec * (this->diffTime[0]) * 0.5;
+        this->diffTime[2] = this->diffTime[0];
+        this->diffVel[2] = this->diffVel[0];
+
+        this->initVel[0] = 0.0;
+        this->diffVel[0] = this->jerk * this->diffTime[0] * this->diffTime[0] * 0.5;
+        this->initVel[1] = this->diffVel[0];
+        this->initVel[2] = this->initVel[1];
+        this->diffVel[2] = this->diffVel[0];
+        this->diffPos[0] = this->jerk * this->diffTime[0] * this->diffTime[0] * this->diffTime[0] / 6.0;
+        this->diffPos[2] = this->targetVel * this->diffTime[2] - this->jerk * this->diffTime[0] * this->diffTime[0] * this->diffTime[0] / 6.0;
+    }
+    else
+    {
+        this->diffVel[1] = this->targetVel - (this->diffVel[0] + this->diffVel[2]);
+        this->diffTime[1] = fabs(this->diffVel[1] / this->accDec);
+        this->initVel[0] = 0.0;
+        this->initVel[1] = this->diffVel[0];
+        this->initVel[2] = this->initVel[1] + this->diffVel[1];
+        this->diffVel[2] = this->diffVel[0];
+        this->jerk * this->diffTime[0] * this->diffTime[0] * this->diffTime[0] / 6.0;
+        this->diffPos[1] = (this->initVel[1] + this->initVel[2]) * this->diffTime[1] * 0.5;        
+        this->diffPos[0] = this->jerk * this->diffTime[0] * this->diffTime[0] * this->diffTime[0] / 6.0;
+        this->diffPos[2]  = targetVel  * this->diffTime[2] - this->diffPos[0];
+    }
+
+}
 
