@@ -5,7 +5,8 @@ using namespace std;
 #include <vector>
 #include <cmath>
 
-class CommandInfo{
+class CommandInfo
+{
 public:
     CommandInfo();
     ~CommandInfo();

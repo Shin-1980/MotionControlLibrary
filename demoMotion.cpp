@@ -2,8 +2,8 @@ using namespace std;
 #include <iostream>
 #include "TestSuite.h"
 
-int main(){
-
+int main()
+{
     int count = 0;
 
     count++;

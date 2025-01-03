@@ -1,6 +1,7 @@
 #include "TestSuite.h"
 
-bool testCase_TrapezoidalProfile_001() {
+bool testCase_TrapezoidalProfile_001() 
+{
     TrapezoidalProfile prof;
 
     double startPos = 0.0;
@@ -13,10 +14,11 @@ bool testCase_TrapezoidalProfile_001() {
     double preVel = 0;
     double curVel = 0;
 
-    string filename = "./testCase/case1.csv";
+    string filename = "./testCase/case_Trape_001.csv";
     ifstream file(filename);
 
-    if (!file.is_open()) {
+    if (!file.is_open()) 
+    {
         cerr << "Error: Could not open file " << filename << endl;
         return false;
     }
@@ -24,22 +26,26 @@ bool testCase_TrapezoidalProfile_001() {
     if (!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0)) return false;
 
     string line;
-    while (getline(file, line) && prof.calDis(cycleTime)) { // Read the file line by line
+    while (getline(file, line) && prof.calDis(cycleTime)) 
+    { // Read the file line by line
         stringstream ss(line);   // Use stringstream to parse the line
         string value;
         vector<string> row; // Store the values of the current row
 
-        while (getline(ss, value, ',')) { // Split by comma
+        while (getline(ss, value, ',')) 
+        { // Split by comma
             row.push_back(value);
         }
 
         double dis = prof.getCurDis();
-        if (abs(dis - stof(row[0]) > 0.0001)) {
+        if (abs(dis - stof(row[0]) > 0.0001)) 
+        {
             return false;
         }
     }
     
-    if (abs(prof.getCurDis() - tarPos > 0.0001)) {
+    if (abs(prof.getCurDis() - tarPos > 0.0001)) 
+    {
         return false;
     }
 
@@ -48,7 +54,8 @@ bool testCase_TrapezoidalProfile_001() {
     return true;
 }
 
-bool testCase_TrapezoidalProfile_002() {
+bool testCase_TrapezoidalProfile_002() 
+{
     TrapezoidalProfile prof;
 
     double startPos = 0.0;
@@ -61,10 +68,11 @@ bool testCase_TrapezoidalProfile_002() {
     double preVel = 0;
     double curVel = 0;
 
-    string filename = "./testCase/case2.csv";
+    string filename = "./testCase/case_Trape_002.csv";
     ifstream file(filename);
 
-    if (!file.is_open()) {
+    if (!file.is_open()) 
+    {
         cerr << "Error: Could not open file " << filename << endl;
         return 1;
     }
@@ -72,23 +80,27 @@ bool testCase_TrapezoidalProfile_002() {
     if (!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0)) return false;
 
     string line;
-    while (getline(file, line) && prof.calDis(cycleTime)) { // Read the file line by line
+    while (getline(file, line) && prof.calDis(cycleTime)) 
+    { // Read the file line by line
         stringstream ss(line);   // Use stringstream to parse the line
         string value;
         vector<string> row; // Store the values of the current row
 
-        while (getline(ss, value, ',')) { // Split by comma
+        while (getline(ss, value, ',')) 
+        { // Split by comma
             row.push_back(value);
         }
 
         double dis = prof.getCurDis();
         
-        if (abs(dis - stof(row[0]) > 0.0001)) {
+        if (abs(dis - stof(row[0]) > 0.0001)) 
+        {
             return false;
         }
     }
     
-    if (abs(prof.getCurDis() - tarPos > 0.0001)) {
+    if (abs(prof.getCurDis() - tarPos > 0.0001)) 
+    {
         return false;
     }
 
@@ -98,7 +110,8 @@ bool testCase_TrapezoidalProfile_002() {
 
 }
 
-bool testCase_TrapezoidalProfile_003() {
+bool testCase_TrapezoidalProfile_003() 
+{
     TrapezoidalProfile prof;
 
     double cycleTime = 0.01;
@@ -108,7 +121,8 @@ bool testCase_TrapezoidalProfile_003() {
     return false;
 }
 
-bool testCase_TrapezoidalProfile_004() {
+bool testCase_TrapezoidalProfile_004() 
+{
     TrapezoidalProfile prof;
 
     if (prof.getCurDis() == 0.0) return true;
@@ -116,7 +130,8 @@ bool testCase_TrapezoidalProfile_004() {
     return false;
 }
 
-bool testCase_TrapezoidalProfile_005() {
+bool testCase_TrapezoidalProfile_005() 
+{
     TrapezoidalProfile prof;
 
     double startPos = 0.0;
@@ -134,7 +149,8 @@ bool testCase_TrapezoidalProfile_005() {
     return false;
 }
 
-bool testCase_TrapezoidalProfile_006() {
+bool testCase_TrapezoidalProfile_006() 
+{
     TrapezoidalProfile prof;
 
     double startPos = 0.0;
@@ -152,7 +168,8 @@ bool testCase_TrapezoidalProfile_006() {
     return false;
 }
 
-bool testCase_TrapezoidalProfile_007() {
+bool testCase_TrapezoidalProfile_007() 
+{
     TrapezoidalProfile prof;
 
     double startPos = 0.0;
@@ -170,7 +187,8 @@ bool testCase_TrapezoidalProfile_007() {
     return false;
 }
 
-bool testCase_TrapezoidalProfile_101(void){
+bool testCase_TrapezoidalProfile_101(void)
+{
     int dof = 6;
     MotionController mc(dof);
 
@@ -220,15 +238,17 @@ bool testCase_TrapezoidalProfile_101(void){
 
     vector<double> cmdPose = curPose;
 
-    string filename = "./testCase/case101.csv";
+    string filename = "./testCase/case_Trape_101.csv";
     ifstream file(filename);
 
-    if (!file.is_open()) {
+    if (!file.is_open()) 
+    {
         cerr << "Error: Could not open file " << filename << endl;
         return 1;
     }
     string line;
-    while (getline(file, line) && mc.execCmd(cycleTime)) { // Read the file line by line
+    while (getline(file, line) && mc.execCmd(cycleTime))
+    { // Read the file line by line
         stringstream ss(line);   // Use stringstream to parse the line
         string value;
         vector<string> row; // Store the values of the current row
@@ -246,16 +266,19 @@ bool testCase_TrapezoidalProfile_101(void){
 
     cmdPose = mc.getCmdPose();
 
-    for (size_t i=0;i<dof;i++) {
+    for (size_t i=0;i<dof;i++) 
+    {
         if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
     }
 
     execProf1.reset();
+    file.close();
 
     return true;
 }
 
-bool testCase_TrapezoidalProfile_102(void){
+bool testCase_TrapezoidalProfile_102(void)
+{
         
     int dof = 6;
     MotionController mc(dof);
@@ -306,27 +329,31 @@ bool testCase_TrapezoidalProfile_102(void){
 
     vector<double> cmdPose = curPose;
 
-    string filename = "./testCase/case102.csv";
+    string filename = "./testCase/case_Trape_102.csv";
     ifstream file(filename);
 
-    if (!file.is_open()) {
+    if (!file.is_open()) 
+    {
         cerr << "Error: Could not open file " << filename << endl;
         return 1;
     }
 
     string line;
-    while (getline(file, line) && mc.execCmd(cycleTime)) { // Read the file line by line
+    while (getline(file, line) && mc.execCmd(cycleTime)) 
+    { // Read the file line by line
         stringstream ss(line);   // Use stringstream to parse the line
         string value;
         vector<string> row; // Store the values of the current row
 
-        while (getline(ss, value, ',')) { // Split by comma
+        while (getline(ss, value, ',')) 
+        { // Split by comma
             row.push_back(value);
         }
 
         cmdPose = mc.getCmdPose();
 
-        for (size_t i=0;i<dof;i++) {
+        for (size_t i=0;i<dof;i++) 
+        {
             if (abs(cmdPose[i] - stof(row[i])) > 0.0001) {
                 return false;
             }
@@ -336,16 +363,19 @@ bool testCase_TrapezoidalProfile_102(void){
     if (mc.execCmd(cycleTime)) return false;
 
     cmdPose = mc.getCmdPose();
-    for (size_t i=0;i<dof;i++) {
+    for (size_t i=0;i<dof;i++) 
+    {
         if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
     }
 
     execProf.reset();
+    file.close();
 
     return true;
 }
 
-bool testCase_TrapezoidalProfile_103(){
+bool testCase_TrapezoidalProfile_103()
+{
     int dof = 6;
     MotionController mc(dof);
 
@@ -355,7 +385,8 @@ bool testCase_TrapezoidalProfile_103(){
     return false;
 }
 
-bool testCase_TrapezoidalProfile_104(){
+bool testCase_TrapezoidalProfile_104()
+{
     int dof = 6;
     MotionController mc(dof);
 
@@ -422,11 +453,12 @@ bool testCase_TrapezoidalProfile_104(){
 
     double cycleTime = 0.01;
     vector<double> cmdPose = curPose;
-    string filename = "./testCase/case109.csv";
+    string filename = "./testCase/case_Trape_104.csv";
 
     ifstream file(filename);
 
-    if (!file.is_open()) {
+    if (!file.is_open())
+    {
         cerr << "Error: Could not open file " << filename << endl;
         return 1;
     }
@@ -437,12 +469,14 @@ bool testCase_TrapezoidalProfile_104(){
 */
 
     string line;
-    while (getline(file, line) && mc.execCmd(cycleTime)) { // Read the file line by line
+    while (getline(file, line) && mc.execCmd(cycleTime)) 
+    { // Read the file line by line
         stringstream ss(line);
         string value;
         vector<string> row;
 
-        while (getline(ss, value, ',')) {
+        while (getline(ss, value, ',')) 
+        {
             row.push_back(value);
         }
 
@@ -450,7 +484,8 @@ bool testCase_TrapezoidalProfile_104(){
         //cout << "1097" << endl;
         cmdPose = mc.getCmdPose();
 
-        for (size_t i=0;i<dof;i++) {
+        for (size_t i=0;i<dof;i++) 
+        {
             if (abs(cmdPose[i] - stof(row[i])) > 0.0001) {
                 return false;
             }
@@ -468,7 +503,8 @@ bool testCase_TrapezoidalProfile_104(){
     if (mc.execCmd(cycleTime)) return false;
 
     cmdPose = mc.getCmdPose();
-    for (size_t i=0;i<dof;i++) {
+    for (size_t i=0;i<dof;i++) 
+    {
         if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
     }
 
@@ -476,12 +512,15 @@ bool testCase_TrapezoidalProfile_104(){
     execProf2.reset();
     execProf3.reset();
 
+    file.close();
+
     return true;
 
 }
 
 
-bool testCase_ScurveProfile_001(){
+bool testCase_ScurveProfile_001()
+{
 
     ScurveProfile sc;
     // acc, dec, vel, pos
@@ -494,7 +533,7 @@ bool testCase_ScurveProfile_001(){
     double preVel = 0.0;
     double curAcc = 0.0;
 
-    string filename = "./testCase/case201.csv";
+    string filename = "./testCase/case_Scurve_001.csv";
     ifstream file(filename);
 
     if (!file.is_open()) {
@@ -508,7 +547,8 @@ bool testCase_ScurveProfile_001(){
         string value;
         vector<string> row;
 
-        while (getline(ss, value, ',')) {
+        while (getline(ss, value, ',')) 
+        {
             row.push_back(value);
         }
 
@@ -516,13 +556,16 @@ bool testCase_ScurveProfile_001(){
         curVel = (curPos - prePos) / cycleTime;
         curAcc = (curVel - preVel) / cycleTime;
 
-        if (abs(curPos - stof(row[0])) > 0.0001) {
+        if (abs(curPos - stof(row[0])) > 0.0001) 
+        {
                 return false;
         }
-        if (abs(curVel - stof(row[1])) > 0.0001) {
+        if (abs(curVel - stof(row[1])) > 0.0001) 
+        {
                 return false;
         }
-        if (abs(curAcc - stof(row[2])) > 0.0001) {
+        if (abs(curAcc - stof(row[2])) > 0.0001) 
+        {
                 return false;
         }
 
@@ -530,11 +573,14 @@ bool testCase_ScurveProfile_001(){
         preVel = curVel;
     }
 
+    file.close();
+
     return true;
 
 }
 
-bool testCase_ScurveProfile_002(){
+bool testCase_ScurveProfile_002()
+{
 
     ScurveProfile sc;
     // acc, dec, vel, pos
@@ -547,21 +593,24 @@ bool testCase_ScurveProfile_002(){
     double preVel = 0.0;
     double curAcc = 0.0;
 
-    string filename = "./testCase/case202.csv";
+    string filename = "./testCase/case_Scurve_002.csv";
     ifstream file(filename);
 
-    if (!file.is_open()) {
+    if (!file.is_open()) 
+    {
         cerr << "Error: Could not open file " << filename << endl;
         return 1;
     }
 
     string line;
-    while (getline(file, line) && sc.calDis(cycleTime)) { // Read the file line by line
+    while (getline(file, line) && sc.calDis(cycleTime)) 
+    { // Read the file line by line
         stringstream ss(line);
         string value;
         vector<string> row;
 
-        while (getline(ss, value, ',')) {
+        while (getline(ss, value, ',')) 
+        {
             row.push_back(value);
         }
 
@@ -569,13 +618,16 @@ bool testCase_ScurveProfile_002(){
         curVel = (curPos - prePos) / cycleTime;
         curAcc = (curVel - preVel) / cycleTime;
 
-        if (abs(curPos - stof(row[0])) > 0.0001) {
+        if (abs(curPos - stof(row[0])) > 0.0001) 
+        {
                 return false;
         }
-        if (abs(curVel - stof(row[1])) > 0.0001) {
+        if (abs(curVel - stof(row[1])) > 0.0001) 
+        {
                 return false;
         }
-        if (abs(curAcc - stof(row[2])) > 0.0001) {
+        if (abs(curAcc - stof(row[2])) > 0.0001) 
+        {
                 return false;
         }
 
@@ -583,11 +635,13 @@ bool testCase_ScurveProfile_002(){
         preVel = curVel;
     }
 
+    file.close();
     return true;
 
 }
 
-bool testCase_ScurveProfile_003(){
+bool testCase_ScurveProfile_003()
+{
 
     ScurveProfile sc;
     // acc, dec, vel, pos
@@ -600,21 +654,24 @@ bool testCase_ScurveProfile_003(){
     double preVel = 0.0;
     double curAcc = 0.0;
 
-    string filename = "./testCase/case203.csv";
+    string filename = "./testCase/case_Scurve_003.csv";
     ifstream file(filename);
 
-    if (!file.is_open()) {
+    if (!file.is_open()) 
+    {
         cerr << "Error: Could not open file " << filename << endl;
         return 1;
     }
 
     string line;
-    while (getline(file, line) && sc.calDis(cycleTime)) { // Read the file line by line
+    while (getline(file, line) && sc.calDis(cycleTime)) 
+    { // Read the file line by line
         stringstream ss(line);
         string value;
         vector<string> row;
 
-        while (getline(ss, value, ',')) {
+        while (getline(ss, value, ',')) 
+        {
             row.push_back(value);
         }
 
@@ -622,13 +679,16 @@ bool testCase_ScurveProfile_003(){
         curVel = (curPos - prePos) / cycleTime;
         curAcc = (curVel - preVel) / cycleTime;
 
-        if (abs(curPos - stof(row[0])) > 0.0001) {
+        if (abs(curPos - stof(row[0])) > 0.0001) 
+        {
                 return false;
         }
-        if (abs(curVel - stof(row[1])) > 0.0001) {
+        if (abs(curVel - stof(row[1])) > 0.0001) 
+        {
                 return false;
         }
-        if (abs(curAcc - stof(row[2])) > 0.0001) {
+        if (abs(curAcc - stof(row[2])) > 0.0001) 
+        {
                 return false;
         }
 
@@ -636,11 +696,13 @@ bool testCase_ScurveProfile_003(){
         preVel = curVel;
     }
 
+    file.close();
     return true;
 
 }
 
-bool testCase_ScurveProfile_004() {
+bool testCase_ScurveProfile_004() 
+{
     TrapezoidalProfile prof;
 
     if (prof.getCurDis() == 0.0) return true;
@@ -648,7 +710,8 @@ bool testCase_ScurveProfile_004() {
     return false;
 }
 
-bool testCase_ScurveProfile_005() {
+bool testCase_ScurveProfile_005() 
+{
     TrapezoidalProfile prof;
 
     double startPos = 0.0;
@@ -667,7 +730,8 @@ bool testCase_ScurveProfile_005() {
     return false;
 }
 
-bool testCase_ScurveProfile_006() {
+bool testCase_ScurveProfile_006() 
+{
     TrapezoidalProfile prof;
 
     double startPos = 0.0;
@@ -686,7 +750,8 @@ bool testCase_ScurveProfile_006() {
     return false;
 }
 
-bool testCase_ScurveProfile_007() {
+bool testCase_ScurveProfile_007() 
+{
     ScurveProfile prof;
 
     double startPos = 0.0;
@@ -705,7 +770,8 @@ bool testCase_ScurveProfile_007() {
     return false;
 }
 
-bool testCase_ScurveProfile_008() {
+bool testCase_ScurveProfile_008() 
+{
     ScurveProfile prof;
 
     double startPos = 0.0;
@@ -726,7 +792,8 @@ bool testCase_ScurveProfile_008() {
 
 
 
-bool testCase_ScurveProfile_101(void){
+bool testCase_ScurveProfile_101(void)
+{
         
     int dof = 6;
     MotionController mc(dof);
@@ -804,15 +871,16 @@ bool testCase_ScurveProfile_101(void){
     vector<double> preVels = cmdVels;
     vector<double> cmdAccs = cmdVels;
 
-    string filenamep = "./testCase/case301_pose.csv";
-    //string filenamev = "./testCase/case301_vels.csv";
-    //string filenamea = "./testCase/case301_accs.csv";
+    string filenamep = "./testCase/case_Scurve_101_pose.csv";
+    //string filenamev = "./testCase/case_Scurve_101_vels.csv";
+    //string filenamea = "./testCase/case_Scurve_101_accs.csv";
 
     ifstream filep(filenamep);
     //ifstream filev(filenamev);
     //ifstream filea(filenamea);
 
-    if (!filep.is_open()) {
+    if (!filep.is_open()) 
+    {
         cerr << "Error: Could not open file " << endl;
         return false;
     }
@@ -827,22 +895,26 @@ bool testCase_ScurveProfile_101(void){
     fouta.open(filenamea);
 */
     string line;
-    while (getline(filep, line) && mc.execCmd(cycleTime)) { // Read the file line by line
+    while (getline(filep, line) && mc.execCmd(cycleTime)) 
+    { // Read the file line by line
         stringstream ss(line);
         string value;
         vector<string> row;
 
-        while (getline(ss, value, ',')) {
+        while (getline(ss, value, ',')) 
+        {
             row.push_back(value);
         }
 
         cmdPose = mc.getCmdPose();
 
-        for (size_t i=0;i<dof;i++) {
+        for (size_t i=0;i<dof;i++) 
+        {
             if (abs(cmdPose[i] - stof(row[i])) > 0.0001) return false;
         }
 
-        for (size_t i=0;i<dof;i++) {
+        for (size_t i=0;i<dof;i++) 
+        {
             cmdVels[i] = (cmdPose[i] - prePose[i]) / cycleTime;
             cmdAccs[i] = (cmdVels[i] - preVels[i]) / cycleTime;
 
@@ -863,18 +935,22 @@ bool testCase_ScurveProfile_101(void){
 
     cmdPose = mc.getCmdPose();
 
-    for (size_t i=0;i<dof;i++) {
+    for (size_t i=0;i<dof;i++) 
+    {
         if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
     }
 
     execProf1.reset();
     execProf2.reset();
 
+    filep.close();
+
     return true;
 }
 
 
-bool testCase_ScurveProfile_102(void){
+bool testCase_ScurveProfile_102(void)
+{
         
     int dof = 6;
     MotionController mc(dof);
@@ -961,7 +1037,8 @@ bool testCase_ScurveProfile_102(void){
     //ifstream filev(filenamev);
     //ifstream filea(filenamea);
 
-    if (!filep.is_open()) {
+    if (!filep.is_open()) 
+    {
         cerr << "Error: Could not open file " << endl;
         return false;
     }
@@ -976,22 +1053,26 @@ bool testCase_ScurveProfile_102(void){
     fouta.open(filenamea);
 */
     string line;
-    while (getline(filep, line) && mc.execCmd(cycleTime)) { // Read the file line by line
+    while (getline(filep, line) && mc.execCmd(cycleTime)) 
+    { // Read the file line by line
         stringstream ss(line);
         string value;
         vector<string> row;
 
-        while (getline(ss, value, ',')) {
+        while (getline(ss, value, ',')) 
+        {
             row.push_back(value);
         }
 
         cmdPose = mc.getCmdPose();
 
-        for (size_t i=0;i<dof;i++) {
+        for (size_t i=0;i<dof;i++) 
+        {
             if (abs(cmdPose[i] - stof(row[i])) > 0.0001) return false;
         }
         
-        for (size_t i=0;i<dof;i++) {
+        for (size_t i=0;i<dof;i++) 
+        {
             cmdVels[i] = (cmdPose[i] - prePose[i]) / cycleTime;
             cmdAccs[i] = (cmdVels[i] - preVels[i]) / cycleTime;
 
@@ -1011,7 +1092,8 @@ bool testCase_ScurveProfile_102(void){
 
     cmdPose = mc.getCmdPose();
 
-    for (size_t i=0;i<dof;i++) {
+    for (size_t i=0;i<dof;i++) 
+    {
         if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
         //cout << cmdPose[i] << ",";
     }
@@ -1019,6 +1101,8 @@ bool testCase_ScurveProfile_102(void){
 
     execProf1.reset();
     execProf2.reset();
+
+    filep.close();
 
     return true;
 }
