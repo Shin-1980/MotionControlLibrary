@@ -28,6 +28,7 @@
 #include <QApplication>
 #include <QDateTime>
 #include <QMutexLocker>
+#include <memory>
 #include <rl/math/Quaternion.h>
 #include <rl/math/Unit.h>
 #include <rl/plan/Eet.h>
@@ -41,6 +42,7 @@
 #include "MainWindow.h"
 #include "Thread.h"
 #include "Viewer.h"
+#include "MotionController.h"
 
 #include <iostream>
 
@@ -315,15 +317,18 @@ Thread::run()
 	
 	benchmark << ",";
 	benchmark << plannerDuration;
-	
+
 	rl::plan::VectorList orgPath;
 	rl::plan::VectorList path;
+	int dof = 6;
+
+	shared_ptr<MotionController> mc = make_shared<MotionController>(dof);
 	
 	if (solved)
 	{	  
 		orgPath = MainWindow::instance()->planner->getPath();
 
-		std::vector<double> curPose(6,0.0);
+		std::vector<double> curPose(dof,0.0);
 
 		rl::plan::VectorList::iterator idx = orgPath.begin();
 		curPose[0] = (*idx)[0];
@@ -333,13 +338,13 @@ Thread::run()
 		curPose[4] = (*idx)[4];
 		curPose[5] = (*idx)[5];
 
-		MainWindow::instance()->motionCtrl->setCurrentPose(curPose);
+		mc->setCurrentPose(curPose);
 		idx++;
 
 		std::vector<double> targetPose = curPose;
-		std::vector<double> targetVelsRad(6,0.0);
-		std::vector<double> targetAccsRad(6,0.0);
-		std::vector<double> targetJerksRad(6,0.0);
+		std::vector<double> targetVelsRad(dof,0.0);
+		std::vector<double> targetAccsRad(dof,0.0);
+		std::vector<double> targetJerksRad(dof,0.0);
 		
 		targetVelsRad[0] = 5.23598776;
 		targetVelsRad[1] = 5.23598776;
@@ -348,21 +353,20 @@ Thread::run()
 		targetVelsRad[4] = 6.54498469;
 		targetVelsRad[5] = 10.47197551;
 
-		targetAccsRad[0] = 17.45329252;
-		targetAccsRad[1] = 17.45329252;
-		targetAccsRad[2] = 26.17993878;
-		targetAccsRad[3] = 26.17993878;
-		targetAccsRad[4] = 26.17993878;
-		targetAccsRad[5] = 34.90658504;
+		targetAccsRad[0] = 17.45329252 * 2;
+		targetAccsRad[1] = 17.45329252 * 2;
+		targetAccsRad[2] = 26.17993878 * 2;
+		targetAccsRad[3] = 26.17993878 * 2;
+		targetAccsRad[4] = 26.17993878 * 2;
+		targetAccsRad[5] = 34.90658504 * 2;
 
-		targetJerksRad[0] = 1.0;
-		targetJerksRad[1] = 1.0;
-		targetJerksRad[2] = 1.0;
-		targetJerksRad[3] = 1.0;
-		targetJerksRad[4] = 1.0;
-		targetJerksRad[5] = 1.0;		
-
-		int count = 0;
+		targetJerksRad[0] = 25.0;
+		targetJerksRad[1] = 25.0;
+		targetJerksRad[2] = 25.0;
+		targetJerksRad[3] = 25.0;
+		targetJerksRad[4] = 25.0;
+		targetJerksRad[5] = 25.0;		
+		
 		for(; idx != orgPath.end(); idx++)
 		{  
 		  targetPose[0] = (*idx)[0];
@@ -373,18 +377,25 @@ Thread::run()
 		  targetPose[5] = (*idx)[5];
 
 		  shared_ptr<ScurveProfile> execProf = make_shared<ScurveProfile>();		  
-		  MainWindow::instance()->motionCtrl->setScurveProfile(execProf);		  
-		  MainWindow::instance()->motionCtrl->setVelocityProfParam(targetPose, targetVelsRad, targetAccsRad, targetJerksRad);
+		  mc->setScurveProfile(execProf);		  
+		  mc->setVelocityProfParam(targetPose, targetVelsRad, targetAccsRad, targetJerksRad);
 		}
 
 		auto vertex = orgPath.front();
 
-		double cycleTime = 0.1;
+		double cycleTime = 0.001;
 		std::vector<double> cmdPose = curPose;
+		vertex[0] = curPose[0];
+		vertex[1] = curPose[1];
+		vertex[2] = curPose[2];
+		vertex[3] = curPose[3];
+		vertex[4] = curPose[4];
+		vertex[5] = curPose[5];
+		path.push_back(vertex);
 				
-		while(MainWindow::instance()->motionCtrl->execCmd(cycleTime))
+		while(mc->execCmd(cycleTime))
 		{
-		  cmdPose = MainWindow::instance()->motionCtrl->getCmdPose();
+		  cmdPose = mc->getCmdPose();
 		  vertex[0] = cmdPose[0];
 		  vertex[1] = cmdPose[1];
 		  vertex[2] = cmdPose[2];
@@ -393,8 +404,16 @@ Thread::run()
 		  vertex[5] = cmdPose[5];
 		  path.push_back(vertex);
 		}
+		cmdPose = mc->getCmdPose();
+		vertex[0] = cmdPose[0];
+		vertex[1] = cmdPose[1];
+		vertex[2] = cmdPose[2];
+		vertex[3] = cmdPose[3];
+		vertex[4] = cmdPose[4];
+		vertex[5] = cmdPose[5];
+		path.push_back(vertex);
 
-		delete(MainWindow::instance()->motionCtrl);
+		mc.reset();
 						     		
 		rl::plan::VectorList::iterator i = path.begin();
 		rl::plan::VectorList::iterator j = ++path.begin();
@@ -448,7 +467,7 @@ Thread::run()
 		{
 			this->drawSweptVolume(path);
 		}
-		
+
 		rl::math::Vector diff(MainWindow::instance()->model->getDofPosition());
 		rl::math::Vector inter(MainWindow::instance()->model->getDofPosition());
 		
@@ -462,7 +481,7 @@ Thread::run()
 			if (i != path.end() && j != path.end())
 			{
 				this->drawConfiguration(*i);
-				usleep(static_cast<std::size_t>(0.01f * 1000.0f * 1000.0f));
+				usleep(static_cast<std::size_t>(0.001f * 1000.0f * 1000.0f));
 			}
 			
 			rl::math::Real delta = MainWindow::instance()->viewer->delta;
@@ -471,21 +490,21 @@ Thread::run()
 			{
 				diff = *j - *i;
 				
-				rl::math::Real steps = 5.0;//std::ceil(MainWindow::instance()->model->distance(*i, *j) / delta);
-				
+				rl::math::Real steps = 1.0;//std::ceil(MainWindow::instance()->model->distance(*i, *j) / delta);
+	 			
 				for (std::size_t k = 1; k < steps + 1; ++k)
 				{
 					if (!this->running) break;
 					
 					MainWindow::instance()->model->interpolate(*i, *j, k / steps, inter);
 					this->drawConfiguration(inter);
-					usleep(static_cast<std::size_t>(0.01f * 1000.0f * 1000.0f));
+					usleep(static_cast<std::size_t>(0.001f * 1000.0f * 1000.0f));
 				}
 			}
 			
 			if (!this->running) break;
 
-			usleep(static_cast<std::size_t>(1.0f * 1000.0f * 1000.0f));
+			usleep(static_cast<std::size_t>(0.5f * 1000.0f * 1000.0f));
 			
 			rl::plan::VectorList::reverse_iterator ri = path.rbegin();
 			rl::plan::VectorList::reverse_iterator rj = ++path.rbegin();
@@ -493,14 +512,14 @@ Thread::run()
 			if (ri != path.rend() && rj != path.rend())
 			{
 				this->drawConfiguration(*ri);
-				usleep(static_cast<std::size_t>(0.01f * 1000.0f * 1000.0f));
+				usleep(static_cast<std::size_t>(0.001f * 1000.0f * 1000.0f));
 			}
 			
 			for (; ri != path.rend() && rj != path.rend(); ++ri, ++rj)
 			{
 				diff = *rj - *ri;
 				
-				rl::math::Real steps = 5.0;//std::ceil(MainWindow::instance()->model->distance(*ri, *rj) / delta);
+				rl::math::Real steps = 1.0;//std::ceil(MainWindow::instance()->model->distance(*ri, *rj) / delta);
 				
 				for (std::size_t k = 1; k < steps + 1; ++k)
 				{
@@ -508,11 +527,11 @@ Thread::run()
 					
 					MainWindow::instance()->model->interpolate(*ri, *rj, k / steps, inter);
 					this->drawConfiguration(inter);
-					usleep(static_cast<std::size_t>(0.01f * 1000.0f * 1000.0f));
+					usleep(static_cast<std::size_t>(0.001f * 1000.0f * 1000.0f));
 				}
 			}
 
-			usleep(static_cast<std::size_t>(1.0f * 1000.0f * 1000.0f));
+			usleep(static_cast<std::size_t>(0.5f * 1000.0f * 1000.0f));
 		}
 	}
 }
