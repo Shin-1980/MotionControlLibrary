@@ -215,11 +215,11 @@ bool testCase_TrapezoidalProfile_101(void)
     targetPose.push_back(-1.14081f);
 
     vector<double> targetVelsRad;
+    targetVelsRad.push_back(4.23598776f);
+    targetVelsRad.push_back(4.23598776f);
     targetVelsRad.push_back(5.23598776f);
     targetVelsRad.push_back(5.23598776f);
-    targetVelsRad.push_back(6.54498469f);
-    targetVelsRad.push_back(6.54498469f);
-    targetVelsRad.push_back(6.54498469f);
+    targetVelsRad.push_back(5.23598776f);
     targetVelsRad.push_back(10.47197551f);
 
     vector<double> targetAccsRad;
@@ -311,11 +311,11 @@ bool testCase_TrapezoidalProfile_102(void)
 
     vector<double> targetVelsRad;
 
+    targetVelsRad.push_back(0.52359877f);
+    targetVelsRad.push_back(0.52359877f);
     targetVelsRad.push_back(0.65449847f);
     targetVelsRad.push_back(0.65449847f);
     targetVelsRad.push_back(0.65449847f);
-    targetVelsRad.push_back(0.75449847f);
-    targetVelsRad.push_back(0.75449847f);
     targetVelsRad.push_back(1.04719755f);
 
     vector<double> targetAccsRad;
@@ -936,6 +936,7 @@ bool testCase_ScurveProfile_101(void)
     targetPose.push_back(0.0f);
 
     vector<double> targetVelsRad;
+    
     targetVelsRad.push_back(5.23598776f);
     targetVelsRad.push_back(5.23598776f);
     targetVelsRad.push_back(6.54498469f);
@@ -983,13 +984,8 @@ bool testCase_ScurveProfile_101(void)
     vector<double> preVels = cmdVels;
     vector<double> cmdAccs = cmdVels;
 
-    string filenamep = "./testCase/case_Scurve_101_pose.csv";
-    //string filenamev = "./testCase/case_Scurve_101_vels.csv";
-    //string filenamea = "./testCase/case_Scurve_101_accs.csv";
-
+    string filenamep = "./testCase/case_Scurve_101.csv";
     ifstream filep(filenamep);
-    //ifstream filev(filenamev);
-    //ifstream filea(filenamea);
 
     if (!filep.is_open()) 
     {
@@ -997,18 +993,9 @@ bool testCase_ScurveProfile_101(void)
         return false;
     }
 
-/*
-    ofstream foutp;
-    ofstream foutv;
-    ofstream fouta;
-
-    foutp.open(filenamep);
-    foutv.open(filenamev);
-    fouta.open(filenamea);
-*/
     string line;
     while (getline(filep, line) && mc.execCmd(cycleTime)) 
-    { // Read the file line by line
+    { 
         stringstream ss(line);
         string value;
         vector<string> row;
@@ -1030,18 +1017,10 @@ bool testCase_ScurveProfile_101(void)
             cmdVels[i] = (cmdPose[i] - prePose[i]) / cycleTime;
             cmdAccs[i] = (cmdVels[i] - preVels[i]) / cycleTime;
 
-            //cout << cmdPose[i] << ",";
-            //foutp << cmdPose[i] << ",";
-            //foutv << cmdVels[i] << ",";
-            //fouta << cmdAccs[i] << ",";
 
             prePose[i] = cmdPose[i];
             preVels[i] = cmdVels[i];
         }
-        //cout << endl;
-        //foutp << endl;
-        //foutv << endl;
-        //fouta << endl;
 
     }
 
@@ -1141,13 +1120,8 @@ bool testCase_ScurveProfile_102(void)
     vector<double> preVels = cmdVels;
     vector<double> cmdAccs = cmdVels;
 
-    string filenamep = "./testCase/case_Scurve102_pose.csv";
-    //string filenamev = "./testCase/case_Scurve102_vels.csv";
-    //string filenamea = "./testCase/case_Scurve102_accs.csv";
-
+    string filenamep = "./testCase/case_Scurve102.csv";
     ifstream filep(filenamep);
-    //ifstream filev(filenamev);
-    //ifstream filea(filenamea);
 
     if (!filep.is_open()) 
     {
@@ -1155,18 +1129,9 @@ bool testCase_ScurveProfile_102(void)
         return false;
     }
 
-/*
-    ofstream foutp;
-    ofstream foutv;
-    ofstream fouta;
-
-    foutp.open(filenamep);
-    foutv.open(filenamev);
-    fouta.open(filenamea);
-*/
     string line;
     while (getline(filep, line) && mc.execCmd(cycleTime)) 
-    { // Read the file line by line
+    {
         stringstream ss(line);
         string value;
         vector<string> row;
@@ -1188,18 +1153,9 @@ bool testCase_ScurveProfile_102(void)
             cmdVels[i] = (cmdPose[i] - prePose[i]) / cycleTime;
             cmdAccs[i] = (cmdVels[i] - preVels[i]) / cycleTime;
 
-            //cout << cmdPose[i] << ",";
-            //foutp << cmdPose[i] << ",";
-            //foutv << cmdVels[i] << ",";
-            //fouta << cmdAccs[i] << ",";
-
             prePose[i] = cmdPose[i];
             preVels[i] = cmdVels[i];
         }
-        //cout << endl;
-        //foutp << endl;
-        //foutv << endl;
-        //fouta << endl;
     }
 
     cmdPose = mc.getCmdPose();
@@ -1207,9 +1163,7 @@ bool testCase_ScurveProfile_102(void)
     for (size_t i=0;i<dof;i++) 
     {
         if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
-        //cout << cmdPose[i] << ",";
     }
-    //cout << endl;
 
     execProf1.reset();
     execProf2.reset();
@@ -1310,7 +1264,7 @@ bool testCase_ScurveProfile_rand(void)
             cmdAccs[i] = (cmdVels[i] - preVels[i]) / cycleTime;
             //cout << cmdPose[i] << ",";
 
-            if (abs(cmdVels[i]) > targetVelsRad[i] * 2.0) {
+            if (abs(cmdVels[i]) > targetVelsRad[i] * 1.5) {
                 
                 //cout << "Error: " << cmdVels[i] << "," << targetVelsRad[i] << endl;
                 return false;
