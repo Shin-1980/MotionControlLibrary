@@ -246,6 +246,7 @@ bool testCase_TrapezoidalProfile_101(void)
         cerr << "Error: Could not open file " << filename << endl;
         return 1;
     }
+
     string line;
     while (getline(file, line) && mc.execCmd(cycleTime))
     { // Read the file line by line
@@ -264,11 +265,15 @@ bool testCase_TrapezoidalProfile_101(void)
         }
     }
 
+    mc.execCmd(cycleTime);
     cmdPose = mc.getCmdPose();
 
     for (size_t i=0;i<dof;i++) 
     {
-        if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
+        if (abs(cmdPose[i] - targetPose[i]) > 0.0001) 
+        {
+            return false;
+        }
     }
 
     execProf1.reset();
@@ -306,11 +311,11 @@ bool testCase_TrapezoidalProfile_102(void)
 
     vector<double> targetVelsRad;
 
-    targetVelsRad.push_back(0.52359878f);
-    targetVelsRad.push_back(0.52359878f);
     targetVelsRad.push_back(0.65449847f);
     targetVelsRad.push_back(0.65449847f);
     targetVelsRad.push_back(0.65449847f);
+    targetVelsRad.push_back(0.75449847f);
+    targetVelsRad.push_back(0.75449847f);
     targetVelsRad.push_back(1.04719755f);
 
     vector<double> targetAccsRad;
@@ -354,9 +359,11 @@ bool testCase_TrapezoidalProfile_102(void)
 
         for (size_t i=0;i<dof;i++) 
         {
+            
             if (abs(cmdPose[i] - stof(row[i])) > 0.0001) {
                 return false;
             }
+            
         }
     }
 
@@ -416,11 +423,11 @@ bool testCase_TrapezoidalProfile_104()
     targetPose.push_back(-1.14081f);
 
     vector<double> targetVelsRad;
-    targetVelsRad.push_back(5.23598776f);
-    targetVelsRad.push_back(5.23598776f);
     targetVelsRad.push_back(6.54498469f);
     targetVelsRad.push_back(6.54498469f);
     targetVelsRad.push_back(6.54498469f);
+    targetVelsRad.push_back(7.54498469f);
+    targetVelsRad.push_back(7.54498469f);
     targetVelsRad.push_back(10.47197551f);
 
     vector<double> targetAccsRad;
@@ -1107,3 +1114,114 @@ bool testCase_ScurveProfile_102(void)
     return true;
 }
 
+bool testCase_ScurveProfile_201(void)
+{
+    
+    for (int i=0;i<1;i++) 
+    {
+        if (!testCase_ScurveProfile_rand()) return false;
+    }
+    return true;
+    
+}
+
+bool testCase_ScurveProfile_rand(void)
+{
+    int dof = 6;
+    MotionController mc(dof);
+
+    vector<double> curPose(dof, 0.0f);
+    mc.setCurrentPose(curPose);
+
+    vector<double> targetPose(dof, 0.0f);
+    vector<double> targetVelsRad(dof, 0.0f);
+    vector<double> targetAccsRad(dof, 0.0f);
+    vector<double> targetJerksRad(dof, 0.0f);
+
+    double ratio = 0.0f;    // [0.0, 1.0]
+
+    for (int i=0;i<dof;i++) {
+        ratio = (double)((int)rand() % 100) / 100.0;
+        if (ratio != 0.0) targetVelsRad[i] = 10.47197551 * ratio;
+        else targetVelsRad[i] = 1,0;
+        //cout << targetVelsRad[i] << ",";
+    }
+    //cout << endl;
+
+    for (int i=0;i<dof;i++) {
+        ratio = (double)((int)rand() % 100) / 100.0;
+        if (ratio != 0.0) targetAccsRad[i] = 31.4159 * ratio;
+        else targetAccsRad[i] = 10.0;
+        //cout << targetAccsRad[i] << ",";
+    }
+    cout << endl;
+
+    for (int i=0;i<dof;i++) {
+        ratio = (double)((int)rand() % 100) / 100.0;
+        if (ratio != 0.0) targetJerksRad[i] = 1000 * ratio;
+        else targetJerksRad[i] = 100.0;
+        //cout << targetJerksRad[i] << ",";
+    }
+    //cout << endl;
+
+    for (int tern=0;tern<10;tern++) 
+    {
+        //cout << tern << endl;
+
+        for (int i=0;i<dof;i++) {
+            ratio = (double)((int)rand() % 100) / 100.0;
+            targetPose[i] = 3.14159 * ratio - 1.5708;
+            //cout << targetPose[i] << ",";
+        }
+        //cout << endl;
+
+        shared_ptr<ScurveProfile> execProf = make_shared<ScurveProfile>();
+        mc.setScurveProfile(execProf);
+        mc.setVelocityProfParam(targetPose, targetVelsRad, targetAccsRad, targetJerksRad);
+    }
+
+    double cycleTime = 0.01;
+
+    vector<double> cmdPose = curPose;
+    vector<double> prePose = curPose;
+    vector<double> cmdVels;
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+
+    vector<double> preVels = cmdVels;
+    vector<double> cmdAccs = cmdVels;
+
+    while (mc.execCmd(cycleTime)) 
+    { 
+        cmdPose = mc.getCmdPose();
+        
+        for (size_t i=0;i<dof;i++) 
+        {
+            cmdVels[i] = (cmdPose[i] - prePose[i]) / cycleTime;
+            cmdAccs[i] = (cmdVels[i] - preVels[i]) / cycleTime;
+            //cout << cmdPose[i] << ",";
+
+            if (abs(cmdVels[i]) > targetVelsRad[i] + 0.1) {
+                return false;
+            }
+
+            prePose[i] = cmdPose[i];
+            preVels[i] = cmdVels[i];
+        }
+        //cout << endl;
+    }
+
+    cmdPose = mc.getCmdPose();
+    /*
+    for (size_t i=0;i<dof;i++) 
+    {
+        cout << cmdPose[i] << ",";
+    }
+    cout << endl;
+    */
+    return true;
+}

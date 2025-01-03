@@ -8,6 +8,8 @@ using namespace std;
 #include <string>
 #include <cmath>
 #include <memory>
+#include <vector>
+#include <random>
 
 #include "MotionController.h"
 #include "CommandInfo.h"
@@ -40,4 +42,6 @@ bool testCase_ScurveProfile_008();
 bool testCase_ScurveProfile_101();
 bool testCase_ScurveProfile_102();
 
+bool testCase_ScurveProfile_201();
+bool testCase_ScurveProfile_rand();
 #endif // TESTSUITE_H

@@ -97,6 +97,10 @@ bool MotionController::makeLinearProf(shared_ptr<TrajectoryProfile> prof, Comman
     double dis = diss[cmdInfo->getBaseCoordinate()];
     double jerk = jerks[cmdInfo->getBaseCoordinate()];
 
+    for (int i=0;i<this->dof;i++){
+        if (vel > vels[i]) vel = vels[i];
+    }
+
     return prof->makeVelProf(dis, vel, acc, jerk);
 }
 

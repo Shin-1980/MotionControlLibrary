@@ -93,12 +93,11 @@ bool TrapezoidalProfile::calDis(double cycleTime)
 
     else if (this->elapsedTime < this->accConstTime)
         this->curDis = this->accDis + this->targetVel * (this->elapsedTime - this->accTime);
-    else {
+    else if (this->elapsedTime < this->totalTime) {
         double complementaryTime = this->totalTime - this->elapsedTime;
         this->curDis = this->totalDis - 0.5 * complementaryTime * this->acc * complementaryTime;
     }
-
-    if (this->totalTime < this->elapsedTime) {
+    else {
         this->curDis = this->totalDis;
         return false;
     }

@@ -4,6 +4,7 @@
 using namespace std;
 #include <vector>
 #include <memory>
+#include <iostream>
 
 #include "CommandInfo.h"
 #include "TrajectoryProfile.h"
