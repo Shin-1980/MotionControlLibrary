@@ -186,7 +186,7 @@ void ScurveProfile::fillAllProfile(){
     this->diffPos[4] = this->diffPos[2];
 
     this->diffTime[5] = this->diffTime[1];
-    this->diffVel[6] = this->diffVel[1] * -1.0;
+    this->diffVel[5] = this->diffVel[1] * -1.0;
     this->diffPos[5] = this->diffPos[1];	
 
     this->initVel[4] = this->targetVel;

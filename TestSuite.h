@@ -30,6 +30,10 @@ bool testCase_TrapezoidalProfile_102();
 bool testCase_TrapezoidalProfile_103();
 bool testCase_TrapezoidalProfile_104();
 
+bool testCase_TrapezoidalProfile_201();
+bool testCase_TrapezoidalProfile_rand();
+
+
 bool testCase_ScurveProfile_001();
 bool testCase_ScurveProfile_002();
 bool testCase_ScurveProfile_003();

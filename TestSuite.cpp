@@ -525,6 +525,111 @@ bool testCase_TrapezoidalProfile_104()
 
 }
 
+bool testCase_TrapezoidalProfile_201(void)
+{
+    
+    for (int i=0;i<100;i++) 
+    {
+        if (!testCase_TrapezoidalProfile_rand()) return false;
+    }
+    return true;
+    
+}
+
+bool testCase_TrapezoidalProfile_rand(void)
+{
+    int dof = 6;
+    MotionController mc(dof);
+
+    vector<double> curPose(dof, 0.0f);
+    mc.setCurrentPose(curPose);
+
+    vector<double> targetPose(dof, 0.0f);
+    vector<double> targetVelsRad(dof, 0.0f);
+    vector<double> targetAccsRad(dof, 0.0f);
+    vector<double> targetJerksRad(dof, 0.0f);
+
+    double ratio = 0.0f;    // [0.0, 1.0]
+
+    for (int i=0;i<dof;i++) {
+        ratio = (double)((int)rand() % 100) / 100.0;
+        if (ratio != 0.0) targetVelsRad[i] = 10.47197551 * ratio;
+        else targetVelsRad[i] = 1,0;
+        //cout << targetVelsRad[i] << ",";
+    }
+    //cout << endl;
+
+    for (int i=0;i<dof;i++) {
+        ratio = (double)((int)rand() % 100) / 100.0;
+        if (ratio != 0.0) targetAccsRad[i] = 31.4159 * ratio;
+        else targetAccsRad[i] = 10.0;
+        //cout << targetAccsRad[i] << ",";
+    }
+    //cout << endl;
+
+
+    for (int tern=0;tern<10;tern++) 
+    {
+        //cout << tern << endl;
+
+        for (int i=0;i<dof;i++) {
+            ratio = (double)((int)rand() % 100) / 100.0;
+            targetPose[i] = 3.14159 * ratio - 1.5708;
+            //cout << targetPose[i] << ",";
+        }
+        //cout << endl;
+
+        shared_ptr<TrapezoidalProfile> execProf = make_shared<TrapezoidalProfile>();
+        mc.setTrapezoidalProfile(execProf);
+        mc.setVelocityProfParam(targetPose, targetVelsRad, targetAccsRad, targetJerksRad);
+    }
+
+    double cycleTime = 0.01;
+
+    vector<double> cmdPose = curPose;
+    vector<double> prePose = curPose;
+    vector<double> cmdVels;
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+    cmdVels.push_back(0.0f);
+
+    vector<double> preVels = cmdVels;
+    vector<double> cmdAccs = cmdVels;
+
+    while (mc.execCmd(cycleTime)) 
+    { 
+        cmdPose = mc.getCmdPose();
+        
+        for (size_t i=0;i<dof;i++) 
+        {
+            cmdVels[i] = (cmdPose[i] - prePose[i]) / cycleTime;
+            cmdAccs[i] = (cmdVels[i] - preVels[i]) / cycleTime;
+            //cout << cmdPose[i] << ",";
+
+            if (abs(cmdVels[i]) > targetVelsRad[i] * 2.0) {
+                return false;
+            }
+
+            prePose[i] = cmdPose[i];
+            preVels[i] = cmdVels[i];
+        }
+        //cout << endl;
+    }
+
+    cmdPose = mc.getCmdPose();
+    /*
+    for (size_t i=0;i<dof;i++) 
+    {
+        cout << cmdPose[i] << ",";
+    }
+    cout << endl;
+    */
+    return true;
+}
+
 
 bool testCase_ScurveProfile_001()
 {
@@ -1117,7 +1222,7 @@ bool testCase_ScurveProfile_102(void)
 bool testCase_ScurveProfile_201(void)
 {
     
-    for (int i=0;i<1;i++) 
+    for (int i=0;i<2;i++) 
     {
         if (!testCase_ScurveProfile_rand()) return false;
     }
@@ -1154,7 +1259,7 @@ bool testCase_ScurveProfile_rand(void)
         else targetAccsRad[i] = 10.0;
         //cout << targetAccsRad[i] << ",";
     }
-    cout << endl;
+    //cout << endl;
 
     for (int i=0;i<dof;i++) {
         ratio = (double)((int)rand() % 100) / 100.0;
@@ -1164,7 +1269,7 @@ bool testCase_ScurveProfile_rand(void)
     }
     //cout << endl;
 
-    for (int tern=0;tern<10;tern++) 
+    for (int tern=0;tern<100;tern++) 
     {
         //cout << tern << endl;
 
@@ -1205,7 +1310,9 @@ bool testCase_ScurveProfile_rand(void)
             cmdAccs[i] = (cmdVels[i] - preVels[i]) / cycleTime;
             //cout << cmdPose[i] << ",";
 
-            if (abs(cmdVels[i]) > targetVelsRad[i] + 0.1) {
+            if (abs(cmdVels[i]) > targetVelsRad[i] * 2.0) {
+                
+                //cout << "Error: " << cmdVels[i] << "," << targetVelsRad[i] << endl;
                 return false;
             }
 

@@ -4,7 +4,6 @@ MotionController::MotionController(int degreesOfFreedom):
     dof(degreesOfFreedom),        
     execProfId(-1),
     imposedProfId(-1),
-    maxProfNum(8),
     storedProfNum(0),
     curPose(dof, 0.0f),
     curVels(dof, 0.0f),
@@ -40,10 +39,6 @@ void MotionController::setVelocityProfParam(vector<double> targetPose, vector<do
     CommandInfo cmd;
     this->cmdContainer.push_back(cmd);
 
-    if (this->storedProfNum > this->maxProfNum) {
-        //cout << "The number of profiler exceeds the limit" << endl;
-    }
-
     this->cmdContainer[this->storedProfNum].setVelocityProfParam(targetPose, targetVels, targetAccs, targetJerks);
     this->storedProfNum++;
 }
@@ -69,14 +64,12 @@ bool MotionController::makeLinearProf(shared_ptr<TrajectoryProfile> prof, Comman
     vector<double> unsignedTotalDis = cmdInfo->getUnsignedTotalDistance();
     vector<double> targetVel = cmdInfo->getTargetVels();
 
+   double maxTime = 0.0;
+
     for(size_t i=0; i<this->dof; i++) {
         times[i] = unsignedTotalDis[i] / targetVel[i];
-    }
-    
-    double maxTime = 0.0;
-
-    for (size_t i=0;i<this->dof;i++){
-        if (maxTime < times[i]){
+        if (maxTime < times[i])
+        {
             maxTime = times[i];
             cmdInfo->setBaseCoordinate(i);
         }
@@ -97,8 +90,11 @@ bool MotionController::makeLinearProf(shared_ptr<TrajectoryProfile> prof, Comman
     double dis = diss[cmdInfo->getBaseCoordinate()];
     double jerk = jerks[cmdInfo->getBaseCoordinate()];
 
-    for (int i=0;i<this->dof;i++){
-        if (vel > vels[i]) vel = vels[i];
+    for (int i=0;i<this->dof;i++)
+    {
+        if (vel > vels[i]) {
+            vel = vels[i];
+        }
     }
 
     return prof->makeVelProf(dis, vel, acc, jerk);
@@ -106,7 +102,7 @@ bool MotionController::makeLinearProf(shared_ptr<TrajectoryProfile> prof, Comman
 
 bool MotionController::isEnableToExecImposedProf() {
     if (this->imposedProfId != -1 && (this->profContainer[this->execProfId]->isDecelerating() || this->profContainer[this->execProfId]->isDone())){
-        if (this->profContainer[this->execProfId]->decTime < this->profContainer[this->imposedProfId]->totalTime)
+        if (this->profContainer[this->execProfId]->decTime < this->profContainer[this->imposedProfId]->accTime)
             return true;
         else
             if (this->profContainer[this->execProfId]->elapsedTime > (this->profContainer[this->execProfId]->totalTime - this->profContainer[this->imposedProfId]->accTime)) return true;
@@ -154,7 +150,8 @@ bool MotionController::execCmd(double cycleTime) {
             this->curPose[i] = startPose[i] + signedTotalDis[i] * rate;
         }
     }
-    else{
+    else
+    {
         this->curPose = this->cmdContainer[this->execProfId].getTargetPose();
     }
 

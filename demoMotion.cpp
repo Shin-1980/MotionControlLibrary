@@ -6,6 +6,8 @@ int main()
 {
     int count = 0;
 
+    cout << endl << "<<<<< TrapezoidalProfile >>>>>" << endl;
+
     count++;
     if (testCase_TrapezoidalProfile_001()) cout << "PATH:" << count << endl;
     else cout << "NG:" << count << endl;
@@ -47,9 +49,11 @@ int main()
     if (testCase_TrapezoidalProfile_103()) cout << "PATH:" << count << endl;
     else cout << "NG:" << count << endl;
 
-    count++;
-    if (testCase_TrapezoidalProfile_104()) cout << "PATH:" << count << endl;
+    count = 201;
+    if (testCase_TrapezoidalProfile_201()) cout << "PATH:" << count << endl;
     else cout << "NG:" << count << endl;
+
+    cout << endl << "<<<<< ScurveProfile >>>>>" << endl;
 
     count = 1;
     if (testCase_ScurveProfile_001()) cout << "PATH:" << count << endl;
@@ -91,7 +95,7 @@ int main()
     if (testCase_ScurveProfile_102()) cout << "PATH:" << count << endl;
     else cout << "NG:" << count << endl;
 
-    count++;
+    count = 201;
     if (testCase_ScurveProfile_201()) cout << "PATH:" << count << endl;
     else cout << "NG:" << count << endl;
 

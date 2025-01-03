@@ -31,7 +31,6 @@ private:
     int dof;
     int execProfId;
     int imposedProfId;
-    int maxProfNum;
     int storedProfNum;
     
     vector<double> curPose;
