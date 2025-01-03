@@ -14,6 +14,9 @@ The Motion Controller library enables robots to perform dynamic movements by pro
 - Supports S-curve and trapezoidal velocity profiles.
 - Provides modular design for easy integration and testing.
 
+[Watch the video](https://youtu.be/Fnmq7zJaVu8)
+
+
 ## Process Overview
 
 ### Step 1: Copy Required Files
