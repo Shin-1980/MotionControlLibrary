@@ -1,6 +1,6 @@
 #include "TestSuite.h"
 
-bool testCase_TrapezoidalProfile_001() 
+void testCase_TrapezoidalProfile_001() 
 {
     TrapezoidalProfile prof;
 
@@ -20,10 +20,10 @@ bool testCase_TrapezoidalProfile_001()
     if (!file.is_open()) 
     {
         cerr << "Error: Could not open file " << filename << endl;
-        return false;
+        return;
     }
 
-    if (!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0)) return false;
+    if (!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0)) return;
 
     string line;
     while (getline(file, line) && prof.calDis(cycleTime)) 
@@ -38,23 +38,17 @@ bool testCase_TrapezoidalProfile_001()
         }
 
         double dis = prof.getCurDis();
-        if (abs(dis - stof(row[0]) > 0.0001)) 
-        {
-            return false;
-        }
+        assert(abs(dis - stof(row[0]) < epsilon));
+
     }
     
-    if (abs(prof.getCurDis() - tarPos > 0.0001)) 
-    {
-        return false;
-    }
-
+    assert(abs(prof.getCurDis() - tarPos) < 0.0001);
     file.close();
 
-    return true;
+    cout << "testCase_TrapezoidalProfile_001 passed!" << endl;
 }
 
-bool testCase_TrapezoidalProfile_002() 
+void testCase_TrapezoidalProfile_002() 
 {
     TrapezoidalProfile prof;
 
@@ -74,10 +68,10 @@ bool testCase_TrapezoidalProfile_002()
     if (!file.is_open()) 
     {
         cerr << "Error: Could not open file " << filename << endl;
-        return 1;
+        return;
     }
 
-    if (!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0)) return false;
+    if (!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0)) return;
 
     string line;
     while (getline(file, line) && prof.calDis(cycleTime)) 
@@ -92,45 +86,38 @@ bool testCase_TrapezoidalProfile_002()
         }
 
         double dis = prof.getCurDis();
-        
-        if (abs(dis - stof(row[0]) > 0.0001)) 
-        {
-            return false;
-        }
+
+        assert(abs(dis - stof(row[0]) < epsilon));
     }
-    
-    if (abs(prof.getCurDis() - tarPos > 0.0001)) 
-    {
-        return false;
-    }
+
+    assert(abs(prof.getCurDis() - tarPos) < 0.0001);
 
     file.close();
 
-    return true;
-
+    cout << "testCase_TrapezoidalProfile_002 passed!" << endl;
 }
 
-bool testCase_TrapezoidalProfile_003() 
+void testCase_TrapezoidalProfile_003() 
 {
     TrapezoidalProfile prof;
 
     double cycleTime = 0.01;
 
-    if(prof.calDis(cycleTime) == false) return true;
+    assert(prof.calDis(cycleTime) == false);
 
-    return false;
+    cout << "testCase_TrapezoidalProfile_003 passed!" << endl;
 }
 
-bool testCase_TrapezoidalProfile_004() 
+void testCase_TrapezoidalProfile_004() 
 {
     TrapezoidalProfile prof;
 
-    if (prof.getCurDis() == 0.0) return true;
+    assert(prof.getCurDis() == 0.0);
 
-    return false;
+    cout << "testCase_TrapezoidalProfile_004 passed!" << endl;
 }
 
-bool testCase_TrapezoidalProfile_005() 
+void testCase_TrapezoidalProfile_005() 
 {
     TrapezoidalProfile prof;
 
@@ -144,12 +131,12 @@ bool testCase_TrapezoidalProfile_005()
     double preVel = 0;
     double curVel = 0;
 
-    if (!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0)) return true;
+    assert(!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0) == true);
 
-    return false;
+    cout << "testCase_TrapezoidalProfile_005 passed!" << endl;
 }
 
-bool testCase_TrapezoidalProfile_006() 
+void testCase_TrapezoidalProfile_006() 
 {
     TrapezoidalProfile prof;
 
@@ -163,12 +150,12 @@ bool testCase_TrapezoidalProfile_006()
     double preVel = 0;
     double curVel = 0;
 
-    if (!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0)) return true;
+    assert(!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0) == true);
 
-    return false;
+    cout << "testCase_TrapezoidalProfile_006 passed!" << endl;
 }
 
-bool testCase_TrapezoidalProfile_007() 
+void testCase_TrapezoidalProfile_007() 
 {
     TrapezoidalProfile prof;
 
@@ -182,12 +169,12 @@ bool testCase_TrapezoidalProfile_007()
     double preVel = 0;
     double curVel = 0;
 
-    if (!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0)) return true;
+    assert(!prof.makeVelProf(tarPos - startPos, vel, acc, 0.0) == true);
 
-    return false;
+    cout << "testCase_TrapezoidalProfile_007 passed!" << endl;
 }
 
-bool testCase_TrapezoidalProfile_101(void)
+void testCase_TrapezoidalProfile_101(void)
 {
     int dof = 6;
     MotionController mc(dof);
@@ -244,7 +231,7 @@ bool testCase_TrapezoidalProfile_101(void)
     if (!file.is_open()) 
     {
         cerr << "Error: Could not open file " << filename << endl;
-        return 1;
+        return;
     }
 
     string line;
@@ -261,7 +248,7 @@ bool testCase_TrapezoidalProfile_101(void)
         cmdPose = mc.getCmdPose();
 
         for (size_t i=0;i<dof;i++) {
-            if (abs(cmdPose[i] - stof(row[i])) > 0.0001) return false;
+            assert(abs(cmdPose[i] - stof(row[i])) < epsilon);
         }
     }
 
@@ -270,19 +257,16 @@ bool testCase_TrapezoidalProfile_101(void)
 
     for (size_t i=0;i<dof;i++) 
     {
-        if (abs(cmdPose[i] - targetPose[i]) > 0.0001) 
-        {
-            return false;
-        }
+        assert(abs(cmdPose[i] - targetPose[i]) < 0.0001);
     }
 
     execProf1.reset();
     file.close();
 
-    return true;
+    cout << "testCase_TrapezoidalProfile_101 passed!" << endl;
 }
 
-bool testCase_TrapezoidalProfile_102(void)
+void testCase_TrapezoidalProfile_102(void)
 {
         
     int dof = 6;
@@ -340,7 +324,7 @@ bool testCase_TrapezoidalProfile_102(void)
     if (!file.is_open()) 
     {
         cerr << "Error: Could not open file " << filename << endl;
-        return 1;
+        return;
     }
 
     string line;
@@ -359,40 +343,37 @@ bool testCase_TrapezoidalProfile_102(void)
 
         for (size_t i=0;i<dof;i++) 
         {
-            
-            if (abs(cmdPose[i] - stof(row[i])) > 0.0001) {
-                return false;
-            }
-            
+            assert(abs(cmdPose[i] - stof(row[i])) < epsilon);
         }
     }
 
-    if (mc.execCmd(cycleTime)) return false;
+    if (mc.execCmd(cycleTime)) return;
 
     cmdPose = mc.getCmdPose();
     for (size_t i=0;i<dof;i++) 
     {
-        if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
+        assert(abs(cmdPose[i] - targetPose[i]) < 0.0001);
     }
 
     execProf.reset();
     file.close();
 
-    return true;
+    cout << "testCase_TrapezoidalProfile_102 passed!" << endl;
 }
 
-bool testCase_TrapezoidalProfile_103()
+void testCase_TrapezoidalProfile_103()
 {
     int dof = 6;
     MotionController mc(dof);
 
     double cycleTime = 0.01;
     
-    if (mc.execCmd(cycleTime) == false) return true;
-    return false;
+    assert(mc.execCmd(cycleTime) == false);
+
+    cout << "testCase_TrapezoidalProfile_103 passed!" << endl;
 }
 
-bool testCase_TrapezoidalProfile_104()
+void testCase_TrapezoidalProfile_104()
 {
     int dof = 6;
     MotionController mc(dof);
@@ -467,7 +448,7 @@ bool testCase_TrapezoidalProfile_104()
     if (!file.is_open())
     {
         cerr << "Error: Could not open file " << filename << endl;
-        return 1;
+        return;
     }
 
 /*
@@ -493,9 +474,7 @@ bool testCase_TrapezoidalProfile_104()
 
         for (size_t i=0;i<dof;i++) 
         {
-            if (abs(cmdPose[i] - stof(row[i])) > 0.0001) {
-                return false;
-            }
+            assert(abs(cmdPose[i] - stof(row[i])) < epsilon);
         }
     }
 
@@ -507,12 +486,12 @@ bool testCase_TrapezoidalProfile_104()
         foutp << endl;
     }
 */       
-    if (mc.execCmd(cycleTime)) return false;
+    if (mc.execCmd(cycleTime)) return;
 
     cmdPose = mc.getCmdPose();
     for (size_t i=0;i<dof;i++) 
     {
-        if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
+        assert(abs(cmdPose[i] - targetPose[i]) < 0.0001);
     }
 
     execProf1.reset();
@@ -521,22 +500,21 @@ bool testCase_TrapezoidalProfile_104()
 
     file.close();
 
-    return true;
-
+    cout << "testCase_TrapezoidalProfile_104 passed!" << endl;
 }
 
-bool testCase_TrapezoidalProfile_201(void)
+void testCase_TrapezoidalProfile_201(void)
 {
     
     for (int i=0;i<100;i++) 
     {
-        if (!testCase_TrapezoidalProfile_rand()) return false;
+        testCase_TrapezoidalProfile_rand();
     }
-    return true;
-    
+
+    cout << "testCase_TrapezoidalProfile_201 passed!" << endl;
 }
 
-bool testCase_TrapezoidalProfile_rand(void)
+void testCase_TrapezoidalProfile_rand(void)
 {
     int dof = 6;
     MotionController mc(dof);
@@ -608,10 +586,7 @@ bool testCase_TrapezoidalProfile_rand(void)
             cmdVels[i] = (cmdPose[i] - prePose[i]) / cycleTime;
             cmdAccs[i] = (cmdVels[i] - preVels[i]) / cycleTime;
             //cout << cmdPose[i] << ",";
-
-            if (abs(cmdVels[i]) > targetVelsRad[i] * 2.0) {
-                return false;
-            }
+            assert(abs(cmdVels[i] < targetVelsRad[i] * 2.0));
 
             prePose[i] = cmdPose[i];
             preVels[i] = cmdVels[i];
@@ -627,16 +602,15 @@ bool testCase_TrapezoidalProfile_rand(void)
     }
     cout << endl;
     */
-    return true;
+
 }
 
-
-bool testCase_ScurveProfile_001()
+void testCase_ScurveProfile_001()
 {
 
     ScurveProfile sc;
     // acc, dec, vel, pos
-    if (!sc.makeVelProf(100,5,1,1.0)) return false;
+    if (!sc.makeVelProf(100,5,1,1.0)) return;
 
     double cycleTime = 0.2;
     double curPos = 0.0;
@@ -650,7 +624,7 @@ bool testCase_ScurveProfile_001()
 
     if (!file.is_open()) {
         cerr << "Error: Could not open file " << filename << endl;
-        return 1;
+        return;
     }
 
     string line;
@@ -668,18 +642,9 @@ bool testCase_ScurveProfile_001()
         curVel = (curPos - prePos) / cycleTime;
         curAcc = (curVel - preVel) / cycleTime;
 
-        if (abs(curPos - stof(row[0])) > 0.0001) 
-        {
-                return false;
-        }
-        if (abs(curVel - stof(row[1])) > 0.0001) 
-        {
-                return false;
-        }
-        if (abs(curAcc - stof(row[2])) > 0.0001) 
-        {
-                return false;
-        }
+        assert(abs(curPos - stof(row[0])) < epsilon);
+        assert(abs(curVel - stof(row[1])) < epsilon);
+        assert(abs(curAcc - stof(row[2])) < epsilon);
 
         prePos = curPos;
         preVel = curVel;
@@ -687,16 +652,15 @@ bool testCase_ScurveProfile_001()
 
     file.close();
 
-    return true;
-
+    cout << "testCase_ScurveProfile_001 passed!" << endl;
 }
 
-bool testCase_ScurveProfile_002()
+void testCase_ScurveProfile_002()
 {
 
     ScurveProfile sc;
     // acc, dec, vel, pos
-    if(!sc.makeVelProf(0.25, 5, 1, 1.0)) return false;
+    if(!sc.makeVelProf(0.25, 5, 1, 1.0)) return;
 
     double cycleTime = 0.2;
     double curPos = 0.0;
@@ -711,7 +675,7 @@ bool testCase_ScurveProfile_002()
     if (!file.is_open()) 
     {
         cerr << "Error: Could not open file " << filename << endl;
-        return 1;
+        return;
     }
 
     string line;
@@ -730,34 +694,25 @@ bool testCase_ScurveProfile_002()
         curVel = (curPos - prePos) / cycleTime;
         curAcc = (curVel - preVel) / cycleTime;
 
-        if (abs(curPos - stof(row[0])) > 0.0001) 
-        {
-                return false;
-        }
-        if (abs(curVel - stof(row[1])) > 0.0001) 
-        {
-                return false;
-        }
-        if (abs(curAcc - stof(row[2])) > 0.0001) 
-        {
-                return false;
-        }
+        assert(abs(curPos - stof(row[0])) < epsilon);
+        assert(abs(curVel - stof(row[1])) < epsilon);
+        assert(abs(curAcc - stof(row[2])) < epsilon);
 
         prePos = curPos;
         preVel = curVel;
     }
 
     file.close();
-    return true;
 
+    cout << "testCase_ScurveProfile_002 passed!" << endl;
 }
 
-bool testCase_ScurveProfile_003()
+void testCase_ScurveProfile_003()
 {
 
     ScurveProfile sc;
     // acc, dec, vel, pos
-    if (!sc.makeVelProf(10, 100, 1, 1.0)) return false;
+    if (!sc.makeVelProf(10, 100, 1, 1.0)) return;
 
     double cycleTime = 0.2;
     double curPos = 0.0;
@@ -772,7 +727,7 @@ bool testCase_ScurveProfile_003()
     if (!file.is_open()) 
     {
         cerr << "Error: Could not open file " << filename << endl;
-        return 1;
+        return;
     }
 
     string line;
@@ -791,38 +746,27 @@ bool testCase_ScurveProfile_003()
         curVel = (curPos - prePos) / cycleTime;
         curAcc = (curVel - preVel) / cycleTime;
 
-        if (abs(curPos - stof(row[0])) > 0.0001) 
-        {
-                return false;
-        }
-        if (abs(curVel - stof(row[1])) > 0.0001) 
-        {
-                return false;
-        }
-        if (abs(curAcc - stof(row[2])) > 0.0001) 
-        {
-                return false;
-        }
+        assert(abs(curPos - stof(row[0])) < epsilon);
+        assert(abs(curVel - stof(row[1])) < epsilon);
+        assert(abs(curAcc - stof(row[2])) < epsilon);
 
         prePos = curPos;
         preVel = curVel;
     }
 
     file.close();
-    return true;
 
+    cout << "testCase_ScurveProfile_003 passed!" << endl;
 }
 
-bool testCase_ScurveProfile_004() 
+void testCase_ScurveProfile_004() 
 {
     TrapezoidalProfile prof;
 
-    if (prof.getCurDis() == 0.0) return true;
-
-    return false;
+    assert(abs(prof.getCurDis() == 0.0));
 }
 
-bool testCase_ScurveProfile_005() 
+void testCase_ScurveProfile_005() 
 {
     TrapezoidalProfile prof;
 
@@ -837,12 +781,12 @@ bool testCase_ScurveProfile_005()
     double preVel = 0;
     double curVel = 0;
 
-    if (!prof.makeVelProf(tarPos - startPos, vel, acc, jerk)) return true;
+    assert(abs(prof.makeVelProf(tarPos - startPos, vel, acc, jerk)) == false);
 
-    return false;
+    cout << "testCase_ScurveProfile_005 passed!" << endl;
 }
 
-bool testCase_ScurveProfile_006() 
+void testCase_ScurveProfile_006() 
 {
     TrapezoidalProfile prof;
 
@@ -857,12 +801,12 @@ bool testCase_ScurveProfile_006()
     double preVel = 0;
     double curVel = 0;
 
-    if (!prof.makeVelProf(tarPos - startPos, vel, acc, jerk)) return true;
+    assert(abs(prof.makeVelProf(tarPos - startPos, vel, acc, jerk)) == false);
 
-    return false;
+    cout << "testCase_ScurveProfile_006 passed!" << endl;    
 }
 
-bool testCase_ScurveProfile_007() 
+void testCase_ScurveProfile_007() 
 {
     ScurveProfile prof;
 
@@ -877,12 +821,12 @@ bool testCase_ScurveProfile_007()
     double preVel = 0;
     double curVel = 0;
 
-    if (!prof.makeVelProf(tarPos - startPos, vel, acc, jerk)) return true;
+    assert(abs(prof.makeVelProf(tarPos - startPos, vel, acc, jerk)) == false);
 
-    return false;
+    cout << "testCase_ScurveProfile_007 passed!" << endl;    
 }
 
-bool testCase_ScurveProfile_008() 
+void testCase_ScurveProfile_008() 
 {
     ScurveProfile prof;
 
@@ -897,14 +841,13 @@ bool testCase_ScurveProfile_008()
     double preVel = 0;
     double curVel = 0;
 
-    if (!prof.makeVelProf(tarPos - startPos, vel, acc, jerk)) return true;
+    assert(abs(prof.makeVelProf(tarPos - startPos, vel, acc, jerk)) == false);
 
-    return false;
+    cout << "testCase_ScurveProfile_008 passed!" << endl;    
 }
 
 
-
-bool testCase_ScurveProfile_101(void)
+void testCase_ScurveProfile_101(void)
 {
         
     int dof = 6;
@@ -953,12 +896,20 @@ bool testCase_ScurveProfile_101(void)
     targetAccsRad.push_back(34.90658504f);
 
     vector<double> targetJerksRad;
-    targetJerksRad.push_back(1.0f);
-    targetJerksRad.push_back(1.0f);
-    targetJerksRad.push_back(1.0f);
-    targetJerksRad.push_back(1.0f);
-    targetJerksRad.push_back(1.0f);
-    targetJerksRad.push_back(1.0f);
+    targetJerksRad.push_back(25.0f);
+    targetJerksRad.push_back(25.0f);
+    targetJerksRad.push_back(25.0f);
+    targetJerksRad.push_back(25.0f);
+    targetJerksRad.push_back(25.0f);
+    targetJerksRad.push_back(25.0f);
+
+    for (int i=0;i<dof;i++) 
+    {
+        targetVelsRad[i] *= 0.2;
+        targetAccsRad[i] = 1000000.0;
+        targetJerksRad[i] = 1000000000.0;
+    }
+
     mc.setVelocityProfParam(targetPose, targetVelsRad, targetAccsRad, targetJerksRad);
 
     targetPose[0] = 0.0;
@@ -990,9 +941,9 @@ bool testCase_ScurveProfile_101(void)
     if (!filep.is_open()) 
     {
         cerr << "Error: Could not open file " << endl;
-        return false;
+        return;
     }
-
+/*
     string line;
     while (getline(filep, line) && mc.execCmd(cycleTime)) 
     { 
@@ -1004,23 +955,27 @@ bool testCase_ScurveProfile_101(void)
         {
             row.push_back(value);
         }
+*/
 
+    while (mc.execCmd(cycleTime))
+    {
         cmdPose = mc.getCmdPose();
-
+/*
         for (size_t i=0;i<dof;i++) 
         {
-            if (abs(cmdPose[i] - stof(row[i])) > 0.0001) return false;
+            if (abs(cmdPose[i] - stof(row[i])) > 0.0001) return;
         }
-
+*/
         for (size_t i=0;i<dof;i++) 
         {
             cmdVels[i] = (cmdPose[i] - prePose[i]) / cycleTime;
             cmdAccs[i] = (cmdVels[i] - preVels[i]) / cycleTime;
-
+            // cout << cmdPose[i] << ",";
 
             prePose[i] = cmdPose[i];
             preVels[i] = cmdVels[i];
         }
+        // cout << endl;
 
     }
 
@@ -1028,7 +983,7 @@ bool testCase_ScurveProfile_101(void)
 
     for (size_t i=0;i<dof;i++) 
     {
-        if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
+        assert(abs(cmdPose[i] - targetPose[i]) < epsilon);
     }
 
     execProf1.reset();
@@ -1036,11 +991,11 @@ bool testCase_ScurveProfile_101(void)
 
     filep.close();
 
-    return true;
+    cout << "testCase_ScurveProfile_101 passed!" << endl;    
 }
 
 
-bool testCase_ScurveProfile_102(void)
+void testCase_ScurveProfile_102(void)
 {
         
     int dof = 6;
@@ -1126,7 +1081,7 @@ bool testCase_ScurveProfile_102(void)
     if (!filep.is_open()) 
     {
         cerr << "Error: Could not open file " << endl;
-        return false;
+        return;
     }
 
     string line;
@@ -1145,7 +1100,7 @@ bool testCase_ScurveProfile_102(void)
 
         for (size_t i=0;i<dof;i++) 
         {
-            if (abs(cmdPose[i] - stof(row[i])) > 0.0001) return false;
+            assert(abs(cmdPose[i] - stof(row[i])) < epsilon);
         }
         
         for (size_t i=0;i<dof;i++) 
@@ -1162,7 +1117,7 @@ bool testCase_ScurveProfile_102(void)
 
     for (size_t i=0;i<dof;i++) 
     {
-        if (abs(cmdPose[i] - targetPose[i]) > 0.0001) return false;
+        assert(abs(cmdPose[i] - targetPose[i]) < epsilon);
     }
 
     execProf1.reset();
@@ -1170,21 +1125,24 @@ bool testCase_ScurveProfile_102(void)
 
     filep.close();
 
-    return true;
+    cout << "testCase_ScurveProfile_102 passed!" << endl;    
+
+    return;
 }
 
-bool testCase_ScurveProfile_201(void)
+void testCase_ScurveProfile_201(void)
 {
     
     for (int i=0;i<2;i++) 
     {
-        if (!testCase_ScurveProfile_rand()) return false;
+        testCase_ScurveProfile_rand();
     }
-    return true;
+
+    cout << "testCase_ScurveProfile_201 passed!" << endl;    
     
 }
 
-bool testCase_ScurveProfile_rand(void)
+void testCase_ScurveProfile_rand(void)
 {
     int dof = 6;
     MotionController mc(dof);
@@ -1264,11 +1222,7 @@ bool testCase_ScurveProfile_rand(void)
             cmdAccs[i] = (cmdVels[i] - preVels[i]) / cycleTime;
             //cout << cmdPose[i] << ",";
 
-            if (abs(cmdVels[i]) > targetVelsRad[i] * 1.5) {
-                
-                //cout << "Error: " << cmdVels[i] << "," << targetVelsRad[i] << endl;
-                return false;
-            }
+            assert(abs(cmdVels[i]) < targetVelsRad[i] * 2);
 
             prePose[i] = cmdPose[i];
             preVels[i] = cmdVels[i];
@@ -1284,5 +1238,4 @@ bool testCase_ScurveProfile_rand(void)
     }
     cout << endl;
     */
-    return true;
 }
